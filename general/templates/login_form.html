@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<div class="container w-50" >
+  <form action="" method="POST">
+    {{form.hidden_tag()}}
+    <fieldset class="form-group">
+        <div class="container w-50">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                            {% for category, message in messages %}
+                            <div class='alert alert-{{category}} px-5'>
+                                {{ message }}
+                                <span class="closebtn" onclick="this.parentElement.style.display='none';">×</span>
+                            </div>
+                            {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+      <div class="form-group">
+        {{ form.username.label(class='form-control-label') }}
+        {% if form.username.errors %}
+        {{form.username(class='form-control form-control-lg is-invalid')}}
+            {% for error in form.username.errors %}
+                <span class="bg-warning">error</span>
+            {% endfor %}
+            {% else %}
+            {{ form.username(class='form-control form-control-lg')}}
+        {% endif %}
+      </div>
+      <div class="form-group">
+        {{ form.password.label(class='form-control-label') }}
+        {% if form.password.errors %}
+        {{form.password(class='form-control form-control-lg is-invalid')}}
+            {% for error in form.password.errors %}
+                <span class="bg-warning">{{error}}</span>
+            {% endfor %}
+            {% else %}
+            {{ form.password(class='form-control form-control-lg')}}
+        {% endif %}
+      </div>
+    </fieldset>
+    <div class="field-group mt-4">
+        <p>
+            {{ form.remember.label() }} {{ form.remember() }}
+            <span style="padding: 0px 20px;">&nbsp;</span>
+
+        </p>
+
+      {{form.submit(class='btn btn-primary')}}
+        <a class="btn btn-info mx-5" href = {{url_for('register')}}>Нет аккаунта?</a>
+    </div>
+  </form>
+</div>
+{{super()}}
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class=flashes>
+{% for message in messages %}
+  <li>{{ message }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
+<div class="container">
+    <div class="profile-ava"><img src="{{ url_for('userava') }}"></div>
+    <div class="profile-load">
+    <form action="{{url_for('upload')}}" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit" value="Загрузить">
+    </form>
+    </div>
+    <a href={{ url_for('logout') }}><img src="static/img/jump.gif" alt="exit"></a>
+    <a href={{url_for('admin.login')}}><p>Админ панель</p></a>
+    <!--<a href={{ url_for('logout') }}>Wanna leave?</a>-->
+</div>
+{% endblock %}

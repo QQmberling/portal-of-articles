@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{{super()}}
+<link href="{{ url_for('static', filename='css/main.css')}}" rel="stylesheet">
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        {% if content|length != 0 %}
+            {% for elem in content %}
+            <div class="test2 col-md-auto text-center pt-2 test">
+                <a href="{{url_for('profile_with_login', login=elem[1].login)}}">
+                    <span class="fs-3 fst-italic">{{ elem[1].login }}</span>
+                    <br>
+                    <img class="test m-3" style="width:{{ elem[1].avatar_width_other() + 2 }}px; height: {{ elem[1].avatar_height_other() + 2 }}px" src="{{url_for('static', filename='other_profile_pics/' + elem[1].picture_name)}}">
+                </a>
+                <br>
+                <div class="container">
+                Дата регистрации: {{ elem[1].date.date() }}, {{ elem[1].date.time().strftime("%H:%M") }}
+                <br>
+                Написано статей: {{ elem[1].articles|length }}
+                </div>
+            </div>
+            <div class="col test2">
+                <div class="alert alert-info m-5">
+                    <h2>{{ elem[0].title }}</h2>
+                    <p>{{ elem[0].intro }}</p>
+                    <p><b>Дата: {{ elem[0].date.date() }}, {{ elem[0].date.time().strftime("%H:%M") }}</b></p>
+                    <a href="/posts/{{ elem[0].id }}" class="btn btn-warning">Детальнее</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <p>У нас еще нет статей на сайте</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

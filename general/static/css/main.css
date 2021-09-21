@@ -1,0 +1,126 @@
+.signature {
+    margin-left: auto;
+    margin-right: 0em;
+    max-width: 20em;
+    text-align: right;
+    /*background-color: aqua;*/
+}
+.intro {
+    margin-right: auto;
+    margin-left: 0em;
+    max-width: 20em;
+    text-align: justify;
+
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    word-break: break-word;
+}
+.about-text{
+    margin-right: auto;
+    margin-left: 0em;
+    max-width: 50em;
+    text-align: justify;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    word-break: break-word;
+    inline-size: auto;
+}
+
+pre{
+    font-family: Roboto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    /*font-family: Georgia;*/
+}
+body {
+    /*background-color: #d2f4d2;*/
+    background-image: linear-gradient(rgba(255, 0, 0, 0), rgba(255, 0, 0, 0)), url(../img/shrek_back_3.jpg);
+    background-position: top;
+    background-repeat: repeat, no-repeat;
+    background-size: auto, cover;
+    opacity: 85%;
+}
+.right-buttons{
+    margin-left: auto;
+    margin-right: 0em;
+    max-width: 20em;
+    text-align: right;
+}
+.left-buttons{
+    margin-right: auto;
+    margin-left: 0em;
+    max-width: 20em;
+    text-align: left;
+}
+.center {
+    top: 50%;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+.inl{
+    display: inline-block;
+}
+.closebtn {
+    margin-left: 15px;
+    color: gray;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.closebtn:hover {
+    color: black;
+}
+/*a { text-decoration: none; }*/
+a { text-decoration: none; color: navy; }
+a:hover { text-decoration: underline; }
+
+.text-article{
+    height: 500px;
+}
+.text-intro{
+    height: 100px;
+}
+
+.test
+  {
+    border: 2px solid red;
+  }
+.test2
+{
+    border: 1px solid blue;
+}
+
+
+.bubble {
+    background-color: aliceblue;
+    width: 300px;
+    border-radius: 15px;
+    border: 3px solid aliceblue;
+    display: inline-block;
+    position: relative;
+}
+.bubble::after {
+    background-color: aliceblue;
+    content: '';
+    width: 39px;
+    height: 50px;
+    border-left: 3px solid aliceblue;
+    border-bottom: 5px solid aliceblue;
+    position: absolute;
+    bottom: -20px;
+    left: 40px;
+    transform: skewX(-30deg) skewY(-48deg);
+}
+.bubble-in {
+    background-color: aliceblue;
+    border-radius: 12px;
+    padding: 15px;
+    position: relative;
+    z-index: 2;
+}

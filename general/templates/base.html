@@ -1,0 +1,97 @@
+{% extends "bootstrap/base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css">
+<link href="{{ url_for('static', filename='css/main.css')}}" rel="stylesheet">
+{% endblock %}
+
+
+{% block title %}Default Title{% endblock %}
+
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg" style="background-color: #77dd77;">
+  <div class="container-fluid">
+    <a href="{{url_for('index')}}"><img class="navbar-brand-logo px-4" src="{{url_for('static', filename='img/logo2.jpg')}}"></a>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <div class="d-flex px-2">
+        <a class="btn btn-dark btn" href="/posts">Статьи</a>
+      </div>
+      <div class="d-flex px-2">
+        <a class="btn btn-dark btn" href="/authors">Авторы</a>
+      </div>
+    </div>
+    {% if current_user.is_authenticated %}
+      <div class="d-flex px-2">
+        <a class="btn btn-success btn" href="/create-article">Написать статью</a>
+      </div>
+      <div class="d-flex px-2">
+        <a class="btn btn-danger btn" href="/logout">Выйти</a>
+      </div>
+      <div class="d-flex px-2">
+        <a class="btn btn-dark btn" href="/profile">Профиль</a>
+      </div>
+    {% else %}
+      <div class="d-flex px-2">
+        <a class="btn btn-success btn" type="href" href="/register">Регистрация</a>
+      </div>
+      <div class="d-flex px-2">
+        <a class="btn btn-dark btn" type="href" href="/login_form">Войти</a>
+      </div>
+    {% endif %}
+  </div>
+</nav>
+<div class="container w-50 mt-3">
+    <fieldset class="form-group">
+      <legend class='border-bottom mb-4 display-6'>{{context.legend}}</legend>
+    </fieldset>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="container">
+  <footer class="row row-cols-5 py-5 my-5 border-top">
+    <div class="col">
+      <a href="/" class="d-flex align-items-center mb-3 link-dark text-decoration-none">
+        <a href="{{url_for('index')}}"><img class="navbar-brand-logo px-4" src="{{url_for('static', filename='img/logo1.png')}}"></a>
+      </a>
+      <p class="text-dark">©QQmberling Swamp 2021</p>
+      <a href={{url_for('admin.login')}} class="nav-link p-0 text-dark">Админ панель</a>
+    </div>
+    <div class="col">
+    </div>
+    <div class="col">
+      <h5>Somebody</h5>
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-dark">Me</a></li>
+        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-dark">Gonna</a></li>
+      </ul>
+    </div>
+    <div class="col">
+      <h5>Once</h5>
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-dark">The World</a></li>
+        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-dark">Roll</a></li>
+      </ul>
+    </div>
+    <div class="col">
+      <h5>Told</h5>
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-dark">Is</a></li>
+        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-dark">Me</a></li>
+      </ul>
+      </div>
+  </footer>
+</div>
+{% endblock %}
+
+
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+{% endblock %}

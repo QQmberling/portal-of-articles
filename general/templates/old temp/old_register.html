@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+    <form method="POST">
+        <table>
+            <tr>
+                <td>Login</td>
+                <td><input type="text" name="login"></td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td><input type="text" name="password"></td>
+            </tr>
+            <tr>
+                <td>Password retype</td>
+                <td><input type="text" name="password2"></td>
+            </tr>
+            <tr>
+                <td><a href={{ url_for('login_page') }}>Login</a></td>
+                <td><input type="submit" value="Register"></td>
+            </tr>
+        </table>
+    </form>
+{% endblock %}

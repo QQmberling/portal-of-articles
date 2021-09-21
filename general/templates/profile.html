@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="container" style="width: 50%">
+        <div class="row">
+            <div class="col">
+                <div class="d-flex justify-content-center">
+                    <img class="m-3" style="width:{{ current_user.avatar_width_main() + 2 }}px; height: {{ current_user.avatar_height_main() + 2 }}px" src="{{current_user.url_main_avatar()}}">
+                </div>
+                <a href={{url_for('profile_edit')}}><p class="text-center">Редактировать профиль</p></a>
+            </div>
+
+            <div class="col p-2">
+                <ul class='list-group-item'>
+                    <legend class='text-center text-info display-10'>Информация о пользователе</legend>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-3">
+                                Логин:
+                            </div>
+                            <div class="col">
+                               {{ current_user.login }}
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-3">
+                                Имя:
+                            </div>
+                            <div class="col">
+                                {% if current_user.info[0].first_name %}{{ current_user.info[0].first_name }}{% else %}<i>Не указано</i>{% endif %}
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-3">
+                                Фамилия:
+                            </div>
+                            <div class="col">
+                                {% if current_user.info[0].last_name %}{{ current_user.info[0].last_name }}{% else %}<i>Не указано</i>{% endif %}
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-3">
+                                Пол:
+                            </div>
+                            <div class="col">
+                                {% if current_user.info[0].gender %}<b>{{current_user.info[0].gender}}</b>{% else %}<i>Не указано</i>{% endif %}
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">Дата регистрации: {{ current_user.date.date().strftime("%d.%m.%y") }}, {{ current_user.date.time().strftime("%H:%M") }}</li>
+                    <li class="list-group-item">Написано статей: {{ current_user.count_articles() }}</li>
+                    <li class="list-group-item">Написано комментариев: {{ current_user.count_comments() }}</li>
+                    <li class="list-group-item">Последняя активность: {{ current_user.date.date().strftime("%d.%m.%y") }}, {{ current_user.date.time().strftime("%H:%M") }}</li>
+                </ul>
+            </div>
+        </div>
+        <br>
+            <legend class='text-center text-info display-10'>Статьи пользователя</legend>
+            <div class="container">
+                {% if articles|length > 0 %}
+                    {% for el in articles %}
+                        <div class="alert alert-info">
+                            <h2>{{ el.title }}</h2>
+                            <p>{{ el.intro }}</p>
+                            <p><b>Дата: {{ el.date.date().strftime("%d.%m.%y") }}, {{ el.date.time().strftime("%H:%M") }}</b></p>
+                            <a href="/posts/{{ el.id }}" class="btn btn-warning">Детальнее</a>
+                        </div>
+                    {% endfor %}
+                    {% else %}
+                    <p>...</p>
+                {% endif %}
+            </div>
+    </div>
+</div>
+{{super()}}
+{% endblock %}

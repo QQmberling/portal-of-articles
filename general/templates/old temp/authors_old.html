@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<div class="container">
+    {% if authors|length > 0 %}
+        {% for el in authors %}
+        <div class="alert alert-info">
+            <h2>{{ el.login }}</h2>
+            {% for art in el.articles %}
+                <p>{{ art.title }}</p>
+            {% endfor %}
+            <p><b>Дата регистрации: {{ el.date.date() }}, {{ el.date.time().strftime("%H:%M") }}</b></p>
+            <a href="/posts/{{ el.id }}" class="btn btn-warning">Детальнее</a>
+        </div>
+        {% endfor %}
+    {% else %}
+    <h1>Никто ничего не публиковал =(</h1>
+    {% endif %}
+</div>
+{% endblock %}

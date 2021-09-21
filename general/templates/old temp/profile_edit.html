@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{{super()}}
+<link href="{{ url_for('static', filename='css/main.css')}}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+<div class="profile-ava"><img src="{{ image_url }}"></div>
+    <form action="" method="POST" enctype="multipart/form-data">
+        {{form.hidden_tag()}}
+        <div class="profile-load">
+            {{form.avatar.label()}}
+            {{form.avatar(class='form-control-file')}}
+            {% if form.avatar.errors %}
+                {% for error in form.avatar.errors %}
+                    <span class="text-danger">{{error}}</span> <br>
+                {% endfor %}
+            {% endif %}
+            {{form.submit(class='btn btn-primary')}}
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+                <div class='alert alert-danger px-5 m-2'>
+                    {{ error }}
+                    <span class="closebtn" onclick="this.parentElement.style.display='none';">×</span>
+                </div>

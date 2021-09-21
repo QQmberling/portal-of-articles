@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" >
+    {% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class='alert alert-{{category}} px-5 m-2'>
+{{ message }}
+<span class="closebtn" onclick="this.parentElement.style.display='none';">×</span>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+    <div class="d-flex flex-row bd-highlight mb-3">
+        <div class="col-md-auto text-center align-self-top pt-5">
+            <a href="{{url_for('profile_with_login', login=content[1].login)}}">
+                <span class="fs-3 fst-italic">{{ content[1].login }}</span>
+                <br>
+                <img class="m-3" style="width:{{ content[1].avatar_width_other() + 2 }}px; height: {{ content[1].avatar_height_other() + 2 }}px" src="{{url_for('static', filename='other_profile_pics/' + content[1].picture_name)}}">
+            </a>
+            <div class="left-buttons px-3">
+             Дата регистрации: {{ content[1].date.date().strftime("%d.%m.%y") }}, {{ content[1].date.time().strftime("%H:%M") }}
+            <br>
+            Написано статей: {{ content[1].articles|length }}
+            </div>
+        </div>
+    <div class="col">
+        <h1 class="text-center">{{ content[0].title }}</h1>
+        <div class="alert alert-info">
+            <pre class="fs-5" style="text-align: justify">{{ content[0].text }}</pre>
+            <div class="signature">
+                <b>Дата: {{ content[0].date.date().strftime("%d.%m.%y") }}, {{ content[0].date.time().strftime("%H:%M") }}</b>
+                {% if content[0].edit_date != None %}
+                    <p class="fa-bold"><b>Редактировалось: {{ content[0].edit_date.date().strftime("%d.%m.%y") }}, {{ content[0].edit_date.time().strftime("%H:%M") }}</b></p>
+                {% endif %}
+            </div>
+            <div class="row">
+                {% if content[0].able_to_comment %}
+                    <div class="col left-buttons">
+                        <form action="" method="POST">
+                            <button href=# class="btn btn-primary">Оставить комментарий</button>
+                        </form>
+                    </div>
+                {% endif %}
+                {% if current_user.id == content[0].author_id %}
+                    <div class="col right-buttons">
+                        <a href="/posts/{{ content[0].id }}/del" class="btn btn-danger">Удалить</a>
+                        <a href="/posts/{{ content[0].id}}/update" class="btn btn-success">Редактировать</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+        <form action="" method="POST">
+            {% if form != None %}
+            <div class="center p-2" style="width: 80%">
+                {{ form.hidden_tag() }}
+                {{ form.text.label(class='form-control-label') }}
+                {{ form.text(class='form-control form-control-lg', rows=6)}}
+                {{form.submit(class='btn btn-primary m-2')}}
+            </div>
+            {% endif %}
+        </form>
+
+    {% if content[0].able_to_comment %}
+        {% if content[0].comments|length != 0 %}
+        <div class="container w-50 mt-3">
+            <fieldset class="form-group">
+                <legend class='border-bottom mb-4 display-6'>Комментарии</legend>
+            </fieldset>
+        </div>
+            {% for comment in content[0].comments %}
+                <div class="d-flex flex-row bd-highlight mb-3">
+                    <div class="col-md-auto text-center align-self-center pt-2">
+                        <a href="{{url_for('profile_with_login', login=content[1].login)}}">
+                            <span class="fs-3 fst-italic">{{ comment.author.login }}</span>
+                            <br>
+                            <img class="m-3" style="width:{{ comment.author.avatar_width_other() + 2 }}px; height: {{ comment.author.avatar_height_other() + 2 }}px" src="{{url_for('static', filename='other_profile_pics/' + comment.author.picture_name)}}">
+                        </a>
+                        <br>
+                            Дата регистрации: {{ comment.author.date.date().strftime("%d.%m.%y") }}, {{ comment.author.date.time().strftime("%H:%M") }}
+                            <br>
+                            Написано статей: {{ comment.author.articles|length }}
+                    </div>
+                <div class="col">
+                        <div class="alert alert-info">
+                            <pre class="fs-5">{{ comment.text }}</pre>
+                            <div class="signature">
+                                <b>Дата: {{ comment.date.date().strftime("%d.%m.%y") }}, {{ comment.date.time().strftime("%H:%M") }}</b>
+                                {% if comment.edit_date != None %}
+                                    <p class="fa-bocommentld"><b>Редактировалось: {{ comment.edit_date.date().strftime("%d.%m.%y") }}, {{ comment.edit_date.time().strftime("%H:%M") }}</b></p>
+                                {% endif %}
+                            </div>
+                            {% if current_user.id == comment.author_id %}
+                                <a href="{{url_for('comment_delete', id=comment.id)}}" class="btn btn-danger">Удалить</a>
+                                <a href="{{url_for('prank', id=content[0].id)}}" class="btn btn-success">Редактировать</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% else %}
+        <p class="fs-4 text-center"><i>Автор запретил оставлять комментарии.</i></p>
+    {% endif %}
+</div>
+{{super()}}
+{% endblock %}
