@@ -1,15 +1,17 @@
-import sqlite3
 import os
-from general import app, db, manager, TIMEZONE, PROFILE_PIC_NAME, AVATAR_SIZE_MIN, ROOT_MAIN_PICTURES, ROOT_OTHER_PICTURES
+import sqlite3
 from datetime import datetime
-from flask_login import login_user, logout_user, login_required, current_user
-from werkzeug.security import check_password_hash, generate_password_hash
-from flask import render_template, request, redirect, flash, url_for, session, g, make_response
-from general.classes import User, Article, UserInfo, Comment
-from general.forms import LoginForm, RegistrationForm, ArticleCreateForm, ArticleEditForm, UserEditForm, ImageForm, CreateCommentForm
-from general.image import scale_image
-from werkzeug.datastructures import MultiDict
 
+from flask import render_template, request, redirect, flash, url_for, session
+from flask_login import login_user, logout_user, login_required, current_user
+from werkzeug.datastructures import MultiDict
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from general import app, db, manager, TIMEZONE, PROFILE_PIC_NAME
+from general.classes import User, Article, UserInfo, Comment
+from general.forms import LoginForm, RegistrationForm, ArticleCreateForm, ArticleEditForm, UserEditForm, ImageForm, \
+    CreateCommentForm
+from general.image import scale_image
 
 
 @manager.user_loader
@@ -19,29 +21,16 @@ def load_user(user_id):
 
 @app.before_first_request
 def before_first_request():
-    # print("before_first_request() called")
     pass
+
 
 @app.before_request
 def before_request():
-    #session['jopa'] = request.referrer
-    # print(request.referrer, 'request.referrer')
-    # print(request.url, 'request.referrer')
-    # print(request.args, 'request.args')
-    # print(request.form.get('next'), 'request.form.get')
-    # print(request.args.get('next'), 'request.args.get')
-    # print(session['jopa'])
-    # session.pop('jopa', None)
-    # print(session)
     pass
 
 
 @app.after_request
 def after_request(response):
-    # if response.status_code == 401:
-    #     #print('status code', response.status_code)
-    #     request.args['next'] = 123
-    #     #return redirect(url_for('login_page') + '?next=' + request.url)
     return response
 
 
@@ -61,10 +50,9 @@ def save_image(picture_file):
     sub_path = os.path.join(app.root_path, 'static/temp_pics', picture_name)
     picture_file.save(sub_path)
 
-    # Путь для картинки профиля (для отображения в профиле)
-    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_name)
-    # Путь для картинки профиля уменьшенной версии (для остального)
-    picture_path2 = os.path.join(app.root_path, 'static/other_profile_pics', picture_name)
+
+    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_name)  # Путь для картинки профиля (для отображения в профиле)
+    picture_path2 = os.path.join(app.root_path, 'static/other_profile_pics', picture_name)  # Путь для картинки профиля уменьшенной версии (для остального)
 
     scale_image(sub_path, picture_path, target=True)
     scale_image(sub_path, picture_path2, target=False)
@@ -212,29 +200,6 @@ def index():
     return render_template('index.html', context=context)
 
 
-@app.route('/about', methods=['POST', 'GET'])
-def about():
-    context = {'user_is_authenticated': current_user.is_authenticated, 'legend': 'О нас'}
-    if request.method == 'POST':
-        # print(session, 'eto session')
-        # print(request.referrer, 'eto request.args')
-        if current_user.is_authenticated:
-            user = current_user
-            article = Article.query.get(1)
-            # print(type(list(user.articles)[0]))
-            # print(user.articles[0].text)
-            # print(type(article.author))
-        # article = Article.query.all()
-        # for i in range(len(article)):
-        #     print(article[i], 'написан', User.query.get(article[i].author_id))
-        #print(app.url_map)
-        #print(session['visits'])
-        #print(datetime.now(TIMEZONE).time().strftime("%H:%M"))
-        # article = Article.query.get(1)
-        # print(article.able_to_comment)
-    return render_template('about.html', context=context)
-
-
 @app.route('/posts')
 def posts():
     context = {'user_is_authenticated': current_user.is_authenticated, 'legend': 'Статьи'}
@@ -248,8 +213,6 @@ def post_detail(id):
     context = {'user_is_authenticated': current_user.is_authenticated, 'legend': ''}
     article = Article.query.get(id)
     content = db.session.query(Article, User).filter(Article.id == id).filter(Article.author_id == User.id).first()
-    # print(request.args.get('next'))
-    # print(request.args.get('all'))
 
     if request.method == 'POST':
         if current_user.is_authenticated:
@@ -269,7 +232,6 @@ def post_detail(id):
 @app.route('/posts/<int:id>/del')
 @login_required
 def post_delete(id):
-    context = {'user_is_authenticated': current_user.is_authenticated}
     article = Article.query.get_or_404(id)
     if current_user.id == article.author_id:
         try:
@@ -285,7 +247,6 @@ def post_delete(id):
 @app.route('/comment/<int:id>/del')
 @login_required
 def comment_delete(id):
-    context = {'user_is_authenticated': current_user.is_authenticated}
     comment = Comment.query.get_or_404(id)
     if current_user.id == comment.author_id:
         try:
@@ -354,7 +315,6 @@ def login_form():
     context = {'user_is_authenticated': current_user.is_authenticated, 'legend': 'Авторизация'}
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-    # session.pop('_flashes', None)
 
     form = LoginForm()
 
@@ -374,7 +334,6 @@ def login_form():
 
 @app.route('/authors', methods=["POST", "GET"])
 def authors_page():
-    # authors = db.session.query(User, UserInfo).filter(User.id == UserInfo.id).order_by(User.date.desc())
     authors = db.session.query(User, UserInfo).filter(User.id == UserInfo.id).all()
     context = {'user_is_authenticated': current_user.is_authenticated,
                'legend': 'Авторы'

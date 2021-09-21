@@ -1,17 +1,13 @@
-from flask_login import UserMixin
-from flask import url_for
 from datetime import datetime
+
+from flask import url_for
+from flask_login import UserMixin
+
 from general import db, TIMEZONE, ROOT_MAIN_PICTURES, ROOT_OTHER_PICTURES
 from general.image import get_image_size
 
-# authorship = db.Table('authorship',
-#                       db.Column('id', db.Integer, db.ForeignKey('article.id')),
-#                       db.Column('id', db.Integer, db.ForeignKey('user.id'))
-#                       )
-
 
 class Article(db.Model):
-    #__tablename__ = 'articles'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     intro = db.Column(db.String(300), nullable=False)
@@ -21,8 +17,6 @@ class Article(db.Model):
     able_to_comment = db.Column(db.Boolean, default=True)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     author = db.relationship('User', backref=db.backref('articles', lazy=True))
-    # author_id = db.Column(db.Integer, db.ForeignKey('User.id'), nullable=False)
-    # author = db.relationship('User', backref='article')
 
     def __repr__(self):
         return '<Article %r - %r>' % (self.id, self.title)

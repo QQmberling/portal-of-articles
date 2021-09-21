@@ -1,4 +1,5 @@
 from PIL import Image
+
 from general import AVATAR_SIZE_MAX, AVATAR_SIZE_MIN
 
 
@@ -12,7 +13,7 @@ def scale_image(input_image_path, output_image_path, width=None, height=None, ta
     elif height:
         max_size = (w, height)
     else:
-        if target:
+        if target:  # if target == True: need scaled picture for profile. else: need scaled picture for other html's
             max_size = AVATAR_SIZE_MAX
         else:
             max_size = AVATAR_SIZE_MIN

@@ -1,7 +1,7 @@
 import os
 import sqlite3
-from flask import Blueprint, render_template, url_for, redirect, session, request, flash, g
-#from general import db
+
+from flask import Blueprint, render_template, url_for, redirect, session, request, flash
 from flask_login import login_required
 
 from general.classes import Article, User
@@ -14,8 +14,14 @@ menu = [{'url': '.index', 'title': 'Панель'},
         {'url': '.logout', 'title': 'Выйти'}]
 
 
-def isLogged():
-    return True if session.get('admin_logged') else False
+@admin.before_request
+def before_request():
+    pass
+
+
+@admin.teardown_request
+def teardown_request(request):
+    pass
 
 
 def login_admin():
@@ -26,21 +32,8 @@ def logout_admin():
     session.pop('admin_logged', None)
 
 
-@admin.before_request
-def before_request():
-    """Установление соединения с БД перед выполнением запроса"""
-    pass
-    # global db
-    # db = g.get('link_db')
-    # print(db, 'db')
-
-
-@admin.teardown_request
-def teardown_request(request):
-    pass
-    # global db
-    # db = None
-    # return request
+def isLogged():
+    return True if session.get('admin_logged') else False
 
 
 @admin.route('/')

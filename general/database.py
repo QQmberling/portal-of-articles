@@ -2,8 +2,7 @@ from general import db
 
 
 def create_db():
-    tables = db.engine.table_names()
-    #db.metadata.tables.keys() альтернатива
+    tables = db.engine.table_names()  # db.metadata.tables.keys() альтернатива
     if len(tables) == 0:
         db.create_all()
         print('Таблицы успешно созданы')
@@ -17,4 +16,3 @@ def drop_db():
     # db_is_created = os.path.exists(f'general/{DBNAME}')
     # if not db_is_created:
     #     db.create_all()
-
