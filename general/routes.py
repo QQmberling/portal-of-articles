@@ -47,20 +47,19 @@ def save_image(picture_file):
     picture_ext = '.' + picture_file.filename.split('.')[-1]
     picture_name = PROFILE_PIC_NAME + str(current_user.id) + picture_ext
 
-    sub_path = os.path.join(app.root_path, 'static/', picture_name)
-    picture_file.save(sub_path)
-
+    temp_path = os.path.join(app.root_path, 'static/temp_pics', picture_name)
+    picture_file.save(temp_path)
 
     picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_name)  # Путь для картинки профиля (для отображения в профиле)
     picture_path2 = os.path.join(app.root_path, 'static/other_profile_pics', picture_name)  # Путь для картинки профиля уменьшенной версии (для остального)
 
-    scale_image(sub_path, picture_path, target=True)
-    scale_image(sub_path, picture_path2, target=False)
+    scale_image(temp_path, picture_path, target=True)
+    scale_image(temp_path, picture_path2, target=False)
 
-    # if os.path.isfile(sub_path):
-    #     os.remove(sub_path)
-    # else:
-    #     print("File doesn't exists!")
+    if os.path.isfile(temp_path):
+        os.remove(temp_path)
+    else:
+        print("File doesn't exists!")
 
     return picture_name
 
