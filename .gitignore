@@ -2,3 +2,4 @@
 /.idea/
 /.env/
 /general/templates/old temp/
+/general/blog.db
