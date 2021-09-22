@@ -47,7 +47,7 @@ def save_image(picture_file):
     picture_ext = '.' + picture_file.filename.split('.')[-1]
     picture_name = PROFILE_PIC_NAME + str(current_user.id) + picture_ext
 
-    sub_path = os.path.join(app.root_path, 'static/temp_pics', picture_name)
+    sub_path = os.path.join(app.root_path, 'static/', picture_name)
     picture_file.save(sub_path)
 
 
@@ -57,10 +57,10 @@ def save_image(picture_file):
     scale_image(sub_path, picture_path, target=True)
     scale_image(sub_path, picture_path2, target=False)
 
-    if os.path.isfile(sub_path):
-        os.remove(sub_path)
-    else:
-        print("File doesn't exists!")
+    # if os.path.isfile(sub_path):
+    #     os.remove(sub_path)
+    # else:
+    #     print("File doesn't exists!")
 
     return picture_name
 
