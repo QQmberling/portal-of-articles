@@ -6,6 +6,9 @@ def create_db():
     if len(tables) == 0:
         db.create_all()
         print('Таблицы успешно созданы')
+        return True
+    else:
+        return False
 
 
 def drop_db():
