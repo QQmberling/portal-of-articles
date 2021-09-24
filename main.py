@@ -15,14 +15,12 @@ if __name__ == '__main__':
     with open('text.txt') as file:
         text = file.read()
 
-    drop_db()
     create_db()
 
     user = User(login='admin', password=generate_password_hash('admin'), date=datetime.now(TIMEZONE))
     db.session.add(user)
     db.session.commit()
 
-    # print(type(datetime.now(TIMEZONE).strftime("%H:%M:%S - %Y:%m:%d")))
     user_info = UserInfo(id=user.id, first_name='Igor', last_name='Pershin', about='I AM NUMBER ONE')
     db.session.add(user_info)
     db.session.commit()
@@ -43,4 +41,4 @@ if __name__ == '__main__':
     db.session.add(article)
     db.session.commit()
 
-    app.run(debug=True)
+    app.run()
