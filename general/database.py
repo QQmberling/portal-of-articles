@@ -2,13 +2,7 @@ from general import db
 
 
 def create_db():
-    tables = db.engine.table_names()  # db.metadata.tables.keys() альтернатива
-    if len(tables) == 0:
-        db.create_all()
-        print('Таблицы успешно созданы')
-        return True
-    else:
-        return False
+    db.create_all()
 
 
 def drop_db():
