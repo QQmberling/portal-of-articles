@@ -25,8 +25,9 @@ def before_first_request():
 
 
 @app.before_request
-def before_request():
-    pass
+def update_last_active():
+    current_user.last_seen = datetime.now(TIMEZONE)
+    db.session.commit()
 
 
 @app.after_request

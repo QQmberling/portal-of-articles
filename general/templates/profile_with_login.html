@@ -57,7 +57,7 @@
                     <li class="list-group-item">Дата регистрации: {{ profile_user.date.date().strftime("%d.%m.%y") }}, {{ profile_user.date.time().strftime("%H:%M") }}</li>
                     <li class="list-group-item">Написано статей: {{ profile_user.count_articles() }}</li>
                     <li class="list-group-item">Написано комментариев: {{ profile_user.count_comments() }}</li>
-                    <li class="list-group-item">Последняя активность: {{ profile_user.date.date().strftime("%d.%m.%y") }}, {{ profile_user.date.time().strftime("%H:%M") }}</li>
+                    <li class="list-group-item">Последняя активность: {{ profile_user.last_seen.date().strftime("%d.%m.%y") }}, {{ profile_user.last_seen.time().strftime("%H:%M") }}</li>
                 </ul>
             </div>
         </div>

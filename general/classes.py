@@ -28,6 +28,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(200), nullable=False)
     picture_name = db.Column(db.String(20), nullable=False, default='default_male.png')
     date = db.Column(db.DateTime, default=datetime.now(TIMEZONE))
+    last_seen = db.Column(db.DateTime, default=datetime.now(TIMEZONE))
 
     def __repr__(self):
         return '<User %r - %r>' % (self.id, self.login)

@@ -82,7 +82,7 @@
                     <li class="list-group-item">Дата регистрации: {{ current_user.date.date().strftime("%d.%m.%y") }}, {{ current_user.date.time().strftime("%H:%M") }}</li>
                     <li class="list-group-item">Написано статей: {{ current_user.count_articles() }}</li>
                     <li class="list-group-item">Написано комментариев: {{ current_user.count_comments() }}</li>
-                    <li class="list-group-item">Последняя активность: {{ current_user.date.date().strftime("%d.%m.%y") }}, {{ current_user.date.time().strftime("%H:%M") }}</li>
+                    <li class="list-group-item">Последняя активность: {{ current_user.last_seen.date().strftime("%d.%m.%y") }}, {{ current_user.last_seen.time().strftime("%H:%M") }}</li>
                 </ul>
                 <p class="text-center"><a class="btn bg-primary" type="href" href="{{url_for('profile')}}">Отмена</a> {{ form.submit(class="btn bg-primary") }}</p>
             </div>
