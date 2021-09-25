@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
 <div class="container-fluid" >
     <div class="container" style="width: 50%">
         <div class="row">
@@ -64,8 +63,8 @@
         <br>
             <legend class='text-center text-info display-10'>Статьи пользователя</legend>
             <div class="container">
-                {% if articles|length > 0 %}
-                    {% for el in articles %}
+                {% if profile_user.articles|length > 0 %}
+                    {% for el in profile_user.articles %}
                         <div class="alert alert-info">
                             <h2>{{ el.title }}</h2>
                             <p>{{ el.intro }}</p>

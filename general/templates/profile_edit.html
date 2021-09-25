@@ -1,11 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
 <div class="container-fluid" >
     <div class="container" style="width: 50%">
-
-
         {% for field in form if field.name not in ['csrf_token', 'submit'] -%}
             {% if field.errors %}
                 {% for error in field.errors %}
@@ -86,7 +83,6 @@
                 </ul>
                 <p class="text-center"><a class="btn bg-primary" type="href" href="{{url_for('profile')}}">Отмена</a> {{ form.submit(class="btn bg-primary") }}</p>
             </div>
-
         </div>
         <legend class='text-center text-info display-10'>{{ form.about.label(class='form-control-label') }}</legend>
         {{ form.about(class='form-control form-control-lg', rows = '7', cols = '5') }}

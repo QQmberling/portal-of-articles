@@ -1,9 +1,6 @@
 {% extends 'base.html' %}
 
-
-
 {% block content %}
-
 <div class="container-fluid" >
     <div class="container" style="width: 50%">
         {% for author in authors %}
@@ -35,6 +32,5 @@
         {% endfor %}
     </div>
 </div>
-
 {{super()}}
 {% endblock %}

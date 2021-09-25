@@ -45,7 +45,7 @@ def sort_authors(list):
 
 
 def save_image(picture_file):
-    picture_ext = '.' + picture_file.filename.split('.')[-1]
+    picture_ext = f".{picture_file.filename.split('.')[-1]}"
     picture_name = f'{PROFILE_PIC_NAME}{str(current_user.id)}{picture_ext}'
 
     temp_path = os.path.join(app.root_path, 'static/temp_pics', picture_name)
@@ -68,10 +68,7 @@ def save_image(picture_file):
 @app.route('/profile')
 @login_required
 def profile():
-    context = {
-        'user_is_authenticated': current_user.is_authenticated,
-        'legend': f'Профиль {current_user.login}'
-    }
+    context = {'legend': f'Профиль {current_user.login}'}
     articles = db.session.query(Article).filter(Article.author_id == current_user.id).all()
     return render_template('profile.html', context=context, articles=articles)
 
@@ -79,10 +76,7 @@ def profile():
 @app.route('/profile/edit', methods=['POST', 'GET'])
 @login_required
 def profile_edit():
-    context = {
-        'user_is_authenticated': current_user.is_authenticated,
-        'legend': f'Профиль {current_user.login}'
-    }
+    context = {'legend': f'Профиль {current_user.login}'}
 
     if request.method == 'GET':
         form = UserEditForm(MultiDict({'first_name': current_user.info[0].first_name,
@@ -100,11 +94,6 @@ def profile_edit():
         last_name = form.last_name.data
         about = form.about.data
         gender = form.gender.data
-
-        # if user_info is None:
-        #     user_info = UserInfo(id=current_user.id)
-        #     db.session.add(user_info)
-        # print((form.avatar.data.stream.name), 'ЕСЛИ ФАЙЛ ЕСТЬ, ТО НАПИШЕТ ПУТЬ К TMP ЭТОГО ФАЙЛА')
 
         current_user.info[0].about = about
         current_user.info[0].first_name = first_name
@@ -139,14 +128,10 @@ def profile_with_login(login):
     user = db.session.query(User).filter_by(login=login).first()
     if user:
         profile_user = User.query.get(user.id)
-        articles = db.session.query(Article).filter(Article.author_id == profile_user.id).all()
-        context = {'user_is_authenticated': current_user.is_authenticated,
-                   'legend': f'Профиль {login}'
-                   }
+        context = {'legend': f'Профиль {login}'}
         return render_template('profile_with_login.html',
                                context=context,
-                               profile_user=profile_user,
-                               articles=articles)
+                               profile_user=profile_user)
     else:
         return f'Пользователь под логином {login} не найден.'
 
@@ -160,7 +145,7 @@ def logout():
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
-    context = {'user_is_authenticated': current_user.is_authenticated, 'legend': 'Регистрация'}
+    context = {'legend': 'Регистрация'}
     if current_user.is_authenticated:
         return redirect(url_for('profile'))
 
@@ -196,13 +181,13 @@ def register():
 @app.route('/')
 @app.route('/home')
 def index():
-    context = {'user_is_authenticated': current_user.is_authenticated, 'legend': 'Главная'}
+    context = {'legend': 'Главная'}
     return render_template('index.html', context=context)
 
 
 @app.route('/posts')
 def posts():
-    context = {'user_is_authenticated': current_user.is_authenticated, 'legend': 'Статьи'}
+    context = {'legend': 'Статьи'}
     content = db.session.query(Article, User).filter(Article.author_id == User.id).all()
     return render_template('posts.html', content=content, context=context)
 
@@ -210,8 +195,7 @@ def posts():
 @app.route('/posts/<int:id>', methods=['POST', 'GET'])
 def post_detail(id):
     form = None
-    context = {'user_is_authenticated': current_user.is_authenticated, 'legend': ''}
-    article = Article.query.get(id)
+    context = {'legend': ''}
     content = db.session.query(Article, User).filter(Article.id == id).filter(Article.author_id == User.id).first()
 
     if request.method == 'POST':
@@ -262,7 +246,7 @@ def comment_delete(id):
 @app.route('/create-article', methods=['POST', 'GET'])
 @login_required
 def create_article():
-    context = {'user_is_authenticated': current_user.is_authenticated, 'legend': 'Создание статьи'}
+    context = {'legend': 'Создание статьи'}
 
     form = ArticleCreateForm()
 
@@ -284,7 +268,7 @@ def create_article():
 @app.route('/posts/<int:id>/update', methods=['POST', 'GET'])
 @login_required
 def post_update(id):
-    context = {'user_is_authenticated': current_user.is_authenticated, 'legend': 'Редактирование статьи'}
+    context = {'legend': 'Редактирование статьи'}
 
     article = Article.query.get_or_404(id)
     if current_user.id == article.author_id:
@@ -312,7 +296,7 @@ def post_update(id):
 
 @app.route("/login_form", methods=["POST", "GET"])
 def login_form():
-    context = {'user_is_authenticated': current_user.is_authenticated, 'legend': 'Авторизация'}
+    context = {'legend': 'Авторизация'}
     if current_user.is_authenticated:
         return redirect(url_for('index'))
 
@@ -334,10 +318,8 @@ def login_form():
 
 @app.route('/authors', methods=["POST", "GET"])
 def authors_page():
+    context = {'legend': 'Авторы'}
     authors = db.session.query(User, UserInfo).filter(User.id == UserInfo.id).all()
-    context = {'user_is_authenticated': current_user.is_authenticated,
-               'legend': 'Авторы'
-               }
     authors = sort_authors(authors)
     return render_template('authors.html', context=context, authors=authors)
 
