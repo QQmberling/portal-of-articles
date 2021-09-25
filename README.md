@@ -1,5 +1,8 @@
 # Simple blog/forum
 
+Deployed here:
+https://shrekoblog.herokuapp.com/
+
 ## Lanuch locally
 
     $ git clone https://github.com/QQmberling/blog.git
