@@ -45,7 +45,7 @@ def sort_authors(list):
 
 def save_image(picture_file):
     picture_ext = '.' + picture_file.filename.split('.')[-1]
-    picture_name = PROFILE_PIC_NAME + str(current_user.id) + picture_ext
+    picture_name = f'{PROFILE_PIC_NAME}{str(current_user.id)}{picture_ext}'
 
     temp_path = os.path.join(app.root_path, 'static/temp_pics', picture_name)
     picture_file.save(temp_path)
