@@ -176,7 +176,7 @@ def register():
             return render_template('register.html', context=context, form=form)
         else:
             hash_pwd = generate_password_hash(password)
-            new_user = User(login=login, password=hash_pwd)
+            new_user = User(login=login, password=hash_pwd, date=datetime.now(TIMEZONE))
 
             try:
                 db.session.add(new_user)
@@ -195,7 +195,7 @@ def register():
 @app.route('/')
 @app.route('/home')
 def index():
-    context = {'user_is_authenticated': current_user.is_authenticated, 'legend': 'INDEX'}
+    context = {'user_is_authenticated': current_user.is_authenticated, 'legend': 'Главная'}
     return render_template('index.html', context=context)
 
 
@@ -270,9 +270,9 @@ def create_article():
         intro = form.intro.data
         text = form.text.data
         able_to_comment = form.able_to_comment.data
-        article = Article(title=title, intro=intro, text=text, able_to_comment=able_to_comment, author_id=current_user.id)
+        new_article = Article(title=title, intro=intro, text=text, able_to_comment=able_to_comment, author_id=current_user.id, date=datetime.now(TIMEZONE))
         try:
-            db.session.add(article)
+            db.session.add(new_article)
             db.session.commit()
             return redirect('/posts')
         except:
