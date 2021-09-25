@@ -1,3 +1,4 @@
+boto==2.49.0
 click==8.0.1
 colorama==0.4.4
 dnspython==2.1.0
