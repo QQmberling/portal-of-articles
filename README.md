@@ -1,4 +1,4 @@
-# Simple blog/forum
+# Simple blog/forum with Flask framework
 
 Deployed here:
 https://shrekoblog.herokuapp.com/
@@ -10,7 +10,7 @@ https://shrekoblog.herokuapp.com/
 	run main.py
 
 ## Heroku way:
-    install heroku CLI from offical website [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli "Heroku CLI")
+    install heroku CLI from offical website https://devcenter.heroku.com/articles/heroku-cli
 ## Lanuch locally with heroku on Windows
 	$ heroku local web -f Procfile.windows
 ## Lanuch locally with heroku on Linux
