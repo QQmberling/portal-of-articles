@@ -21,6 +21,6 @@ https://shrekoblog.herokuapp.com/
 	$ heroku login
 	$ heroku apps:create app_name
 	$ git push heroku master
-####Also there is an option to create and launch app exactly from website by href of your repo.
+Also there is an option to create and launch app exactly from website by href of your repo.
 
-###End
+End
