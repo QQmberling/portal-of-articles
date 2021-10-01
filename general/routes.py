@@ -2,7 +2,7 @@ import os
 import sqlite3
 from datetime import datetime
 
-from flask import render_template, request, redirect, flash, url_for, session
+from flask import render_template, request, redirect, flash, url_for, session, abort
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.datastructures import MultiDict
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -12,27 +12,6 @@ from general.classes import User, Article, UserInfo, Comment
 from general.forms import LoginForm, RegistrationForm, ArticleCreateForm, ArticleEditForm, UserEditForm, ImageForm, \
     CreateCommentForm
 from general.image import scale_image
-
-
-@manager.user_loader
-def load_user(user_id):
-    return User.query.get(user_id)
-
-
-@app.before_first_request
-def before_first_request():
-    pass
-
-
-@app.before_request
-def update_last_active():
-    current_user.last_seen = datetime.now(TIMEZONE)
-    db.session.commit()
-
-
-@app.after_request
-def after_request(response):
-    return response
 
 
 def sort_authors(list):
@@ -63,6 +42,39 @@ def save_image(picture_file):
         print("File doesn't exists!")
 
     return picture_name
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    context = {'legend': 'Ошибка'}
+    return render_template('404.html', context=context), 404
+
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    context = {'legend': 'Ошибка'}
+    return render_template('500.html', context=context), 500
+
+
+@manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
+
+
+@app.before_first_request
+def before_first_request():
+    pass
+
+
+@app.before_request
+def update_last_active():
+    current_user.last_seen = datetime.now(TIMEZONE)
+    db.session.commit()
+
+
+@app.after_request
+def after_request(response):
+    return response
 
 
 @app.route('/profile')
@@ -125,7 +137,7 @@ def profile_edit():
 def profile_with_login(login):
     if current_user.is_authenticated and current_user.login == login:
         return redirect(url_for('profile'))
-    user = db.session.query(User).filter_by(login=login).first()
+    user = db.session.query(User).filter_by(login=login).first_or_404()
     if user:
         profile_user = User.query.get(user.id)
         context = {'legend': f'Профиль {login}'}
@@ -196,7 +208,7 @@ def posts():
 def post_detail(id):
     form = None
     context = {'legend': ''}
-    content = db.session.query(Article, User).filter(Article.id == id).filter(Article.author_id == User.id).first()
+    content = db.session.query(Article, User).filter(Article.id == id).filter(Article.author_id == User.id).first_or_404()
 
     if request.method == 'POST':
         if current_user.is_authenticated:
@@ -255,7 +267,14 @@ def create_article():
         intro = form.intro.data
         text = form.text.data
         able_to_comment = form.able_to_comment.data
-        new_article = Article(title=title, intro=intro, text=text, able_to_comment=able_to_comment, author_id=current_user.id, date=datetime.now(TIMEZONE))
+
+        new_article = Article(title=title,
+                              intro=intro,
+                              text=text,
+                              able_to_comment=able_to_comment,
+                              author_id=current_user.id,
+                              date=datetime.now(TIMEZONE))
+
         try:
             db.session.add(new_article)
             db.session.commit()

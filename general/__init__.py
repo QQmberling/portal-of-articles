@@ -12,7 +12,7 @@ AVATAR_SIZE_MAX = (400, 400)  # Размер аватара для профил�
 AVATAR_SIZE_MIN = (250, 250)  # Размер аватара для страничек типа authors или post/detail
 
 app = Flask(__name__)
-app.config.from_object('config.DevConfig')
+app.config.from_object('config.ProdConfig')
 
 db = SQLAlchemy(app)
 bootstrap = Bootstrap(app)
