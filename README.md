@@ -1,4 +1,4 @@
-# Simple blog/forum
+# Simple blog/forum with Flask framework
 
 Deployed here:
 https://shrekoblog.herokuapp.com/
@@ -10,7 +10,7 @@ https://shrekoblog.herokuapp.com/
 	run main.py
 
 ## Heroku way:
-    install heroku CLI from offical website [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli "Heroku CLI")
+    install heroku CLI from offical website https://devcenter.heroku.com/articles/heroku-cli
 ## Lanuch locally with heroku on Windows
 	$ heroku local web -f Procfile.windows
 ## Lanuch locally with heroku on Linux
@@ -21,6 +21,6 @@ https://shrekoblog.herokuapp.com/
 	$ heroku login
 	$ heroku apps:create app_name
 	$ git push heroku master
-####Also there is an option to create and launch app exactly from website by href of your repo.
+Also there is an option to create and launch app exactly from heroku website by logging in and fill href of your repo in right place in deploy settings.
 
-###End
+End
