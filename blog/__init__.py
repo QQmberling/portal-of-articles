@@ -24,4 +24,4 @@ manager.login_message_category = 'danger'
 ROOT_MAIN_PICTURES = os.path.join(app.root_path, 'static/profile_pics/')
 ROOT_OTHER_PICTURES = os.path.join(app.root_path, 'static/other_profile_pics/')
 
-from general import classes, routes
+from blog import classes, routes

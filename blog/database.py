@@ -1,4 +1,4 @@
-from general import db
+from blog import db
 
 
 def create_db():
@@ -16,6 +16,6 @@ def drop_db():
     print('Все таблицы успешно удалены')
 
     #
-    # db_is_created = os.path.exists(f'general/{DBNAME}')
+    # db_is_created = os.path.exists(f'blog/{DBNAME}')
     # if not db_is_created:
     #     db.create_all()

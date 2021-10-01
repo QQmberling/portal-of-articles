@@ -1,6 +1,6 @@
 from PIL import Image
 
-from general import AVATAR_SIZE_MAX, AVATAR_SIZE_MIN
+from blog import AVATAR_SIZE_MAX, AVATAR_SIZE_MIN
 
 
 def scale_image(input_image_path, output_image_path, width=None, height=None, target=True):

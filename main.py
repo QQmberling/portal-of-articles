@@ -1,6 +1,6 @@
 from admin.admin import admin
-from general import app
-from general.database import create_db
+from blog import app
+from blog.database import create_db
 
 app.register_blueprint(admin, url_prefix='/admin')
 

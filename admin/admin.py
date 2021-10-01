@@ -4,7 +4,7 @@ import sqlite3
 from flask import Blueprint, render_template, url_for, redirect, session, request, flash
 from flask_login import login_required
 
-from general.classes import Article, User
+from blog.classes import Article, User
 
 admin = Blueprint('admin', __name__, template_folder='templates', static_folder='static')
 

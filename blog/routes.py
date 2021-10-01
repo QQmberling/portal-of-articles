@@ -7,11 +7,11 @@ from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.datastructures import MultiDict
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from general import app, db, manager, TIMEZONE, PROFILE_PIC_NAME
-from general.classes import User, Article, UserInfo, Comment
-from general.forms import LoginForm, RegistrationForm, ArticleCreateForm, ArticleEditForm, UserEditForm, ImageForm, \
+from blog import app, db, manager, TIMEZONE, PROFILE_PIC_NAME
+from blog.classes import User, Article, UserInfo, Comment
+from blog.forms import LoginForm, RegistrationForm, ArticleCreateForm, ArticleEditForm, UserEditForm, ImageForm, \
     CreateCommentForm
-from general.image import scale_image
+from blog.image import scale_image
 
 
 def sort_authors(list):
