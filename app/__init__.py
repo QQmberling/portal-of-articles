@@ -1,0 +1,40 @@
+import datetime
+from os import path
+
+from flask import Flask
+from flask_bootstrap import Bootstrap
+from flask_login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
+from config import config
+
+TIMEZONE = datetime.timezone(datetime.timedelta(hours=3))  # Таймзона Москвы
+PROFILE_PIC_NAME = 'Profile_pic_'  # Начало для названия картинки аватара. Пример: Profile_pic_1 - аватар первого польз.
+AVATAR_SIZE_MAX = (400, 400)  # Размер аватара для профиля
+AVATAR_SIZE_MIN = (250, 250)  # Размер аватара для страничек типа authors или post/detail
+ROOT_MAIN_PICTURES = path.join(path.abspath(path.dirname(__file__)), 'static/profile_pics/')
+ROOT_OTHER_PICTURES = path.join(path.abspath(path.dirname(__file__)), 'static/other_profile_pics/')
+db = SQLAlchemy()
+bootstrap = Bootstrap()
+
+login_manager = LoginManager()
+login_manager.login_view = 'main.login_form'
+login_manager.login_message = 'Необходимо авторизоваться.'
+login_manager.login_message_category = 'danger'
+
+
+def create_app(config_name):
+    app = Flask(__name__)
+    app.config.from_object(config[config_name])
+    config[config_name].init_app(app)
+
+    bootstrap.init_app(app)
+    db.init_app(app)
+    login_manager.init_app(app)
+
+    from .admin import admin as admin_blueprint
+    app.register_blueprint(admin_blueprint, url_prefix='/admin')
+
+    from .main import main as main_blueprint
+    app.register_blueprint(main_blueprint, url_prefix='/')
+
+    return app

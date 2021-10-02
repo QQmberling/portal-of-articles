@@ -10,7 +10,7 @@
 {% block navbar %}
 <nav class="navbar navbar-expand-lg" style="background-color: #77dd77;">
   <div class="container-fluid">
-    <a href="{{url_for('index')}}"><img class="navbar-brand-logo px-4" src="{{url_for('static', filename='img/logo2.jpg')}}"></a>
+    <a href="{{url_for('.index')}}"><img class="navbar-brand-logo px-4" src="{{url_for('static', filename='img/logo2.jpg')}}"></a>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <div class="d-flex px-2">
         <a class="btn btn-dark btn" href="/posts">Статьи</a>
@@ -51,7 +51,7 @@
   <footer class="row row-cols-5 py-5 my-5 border-top">
     <div class="col">
       <a href="/" class="d-flex align-items-center mb-3 link-dark text-decoration-none">
-        <a href="{{url_for('index')}}"><img class="navbar-brand-logo px-4" src="{{url_for('static', filename='img/logo1.png')}}"></a>
+        <a href="{{url_for('.index')}}"><img class="navbar-brand-logo px-4" src="{{url_for('static', filename='img/logo1.png')}}"></a>
       </a>
       <p class="text-dark">©QQmberling Swamp 2021</p>
       <a href={{url_for('admin.login')}} class="nav-link p-0 text-dark">Админ панель</a>
@@ -61,7 +61,7 @@
     <div class="col">
       <h5>Somebody</h5>
       <ul class="nav flex-column">
-        <li class="nav-item mb-2"><a href="{{url_for('profile_with_login', login='Shrek')}}" class="nav-link p-0  text-success">Me</a></li>
+        <li class="nav-item mb-2"><a href="{{url_for('.profile_with_login', login='Shrek')}}" class="nav-link p-0  text-success">Me</a></li>
         <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-dark">Gonna</a></li>
       </ul>
     </div>
@@ -76,7 +76,7 @@
       <h5>Told</h5>
       <ul class="nav flex-column">
         <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-dark">Is</a></li>
-        <li class="nav-item mb-2"><a href="{{url_for('profile_with_login', login='Shrek')}}" class="nav-link p-0 text-success">Me</a></li>
+        <li class="nav-item mb-2"><a href="{{url_for('.profile_with_login', login='Shrek')}}" class="nav-link p-0 text-success">Me</a></li>
       </ul>
       </div>
   </footer>

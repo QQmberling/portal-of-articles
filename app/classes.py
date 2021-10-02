@@ -3,8 +3,8 @@ from datetime import datetime
 from flask import url_for
 from flask_login import UserMixin
 
-from blog import db, TIMEZONE, ROOT_MAIN_PICTURES, ROOT_OTHER_PICTURES
-from blog.image import get_image_size
+from app import db, TIMEZONE, ROOT_MAIN_PICTURES, ROOT_OTHER_PICTURES
+from app.image import get_image_size
 
 
 class Article(db.Model):

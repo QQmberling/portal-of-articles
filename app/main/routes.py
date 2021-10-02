@@ -2,36 +2,38 @@ import os
 import sqlite3
 from datetime import datetime
 
-from flask import render_template, request, redirect, flash, url_for, session, abort
+from flask import render_template, request, redirect, flash, url_for, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.datastructures import MultiDict
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from blog import app, db, manager, TIMEZONE, PROFILE_PIC_NAME
-from blog.classes import User, Article, UserInfo, Comment
-from blog.forms import LoginForm, RegistrationForm, ArticleCreateForm, ArticleEditForm, UserEditForm, ImageForm, \
+from app import TIMEZONE, PROFILE_PIC_NAME
+from app.classes import User, Article, UserInfo, Comment
+from app.image import scale_image
+from . import main
+from .forms import LoginForm, RegistrationForm, ArticleCreateForm, ArticleEditForm, UserEditForm, ImageForm, \
     CreateCommentForm
-from blog.image import scale_image
+from .. import db, login_manager
 
 
-def sort_authors(list):
-    N = len(list)
+def sort_authors(authors):
+    N = len(authors)
     for i in range(N-1):
         for j in range(N-i-1):
-            if len(list[j][0].articles) < len(list[j+1][0].articles):
-                list[j], list[j+1] = list[j+1], list[j]
-    return list
+            if len(authors[j][0].articles) < len(authors[j+1][0].articles):
+                authors[j], authors[j+1] = authors[j+1], authors[j]
+    return authors
 
 
 def save_image(picture_file):
     picture_ext = f".{picture_file.filename.split('.')[-1]}"
     picture_name = f'{PROFILE_PIC_NAME}{str(current_user.id)}{picture_ext}'
 
-    temp_path = os.path.join(app.root_path, 'static/temp_pics', picture_name)
+    temp_path = os.path.join(main.root_path, '../static/temp_pics', picture_name)
     picture_file.save(temp_path)
 
-    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_name)  # Путь для картинки профиля (для отображения в профиле)
-    picture_path2 = os.path.join(app.root_path, 'static/other_profile_pics', picture_name)  # Путь для картинки профиля уменьшенной версии (для остального)
+    picture_path = os.path.join(main.root_path, '../static/profile_pics', picture_name)  # Путь для картинки профиля (для отображения в профиле)
+    picture_path2 = os.path.join(main.root_path, '../static/other_profile_pics', picture_name)  # Путь для картинки профиля уменьшенной версии (для остального)
 
     scale_image(temp_path, picture_path, target=True)
     scale_image(temp_path, picture_path2, target=False)
@@ -44,40 +46,28 @@ def save_image(picture_file):
     return picture_name
 
 
-@app.errorhandler(404)
-def page_not_found(e):
-    context = {'legend': 'Ошибка'}
-    return render_template('404.html', context=context), 404
-
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    context = {'legend': 'Ошибка'}
-    return render_template('500.html', context=context), 500
-
-
-@manager.user_loader
+@login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
 
 
-@app.before_first_request
-def before_first_request():
-    pass
+# @main.before_first_request
+# def before_first_request():
+#     pass
 
 
-@app.before_request
+@main.before_request
 def update_last_active():
     current_user.last_seen = datetime.now(TIMEZONE)
     db.session.commit()
 
 
-@app.after_request
+@main.after_request
 def after_request(response):
     return response
 
 
-@app.route('/profile')
+@main.route('/profile')
 @login_required
 def profile():
     context = {'legend': f'Профиль {current_user.login}'}
@@ -85,7 +75,7 @@ def profile():
     return render_template('profile.html', context=context, articles=articles)
 
 
-@app.route('/profile/edit', methods=['POST', 'GET'])
+@main.route('/profile/edit', methods=['POST', 'GET'])
 @login_required
 def profile_edit():
     context = {'legend': f'Профиль {current_user.login}'}
@@ -128,15 +118,15 @@ def profile_edit():
                     current_user.picture_name = 'default_female.png'
 
         db.session.commit()
-        return redirect(url_for('profile'))
+        return redirect(url_for('.profile'))
 
     return render_template('profile_edit.html', context=context, form=form, form2=form2)
 
 
-@app.route('/profile/<string:login>', methods=['POST', 'GET'])
+@main.route('/profile/<string:login>', methods=['POST', 'GET'])
 def profile_with_login(login):
     if current_user.is_authenticated and current_user.login == login:
-        return redirect(url_for('profile'))
+        return redirect(url_for('.profile'))
     user = db.session.query(User).filter_by(login=login).first_or_404()
     if user:
         profile_user = User.query.get(user.id)
@@ -148,18 +138,18 @@ def profile_with_login(login):
         return f'Пользователь под логином {login} не найден.'
 
 
-@app.route('/logout', methods=['POST', 'GET'])
+@main.route('/logout', methods=['POST', 'GET'])
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('.index'))
 
 
-@app.route('/register', methods=['POST', 'GET'])
+@main.route('/register', methods=['POST', 'GET'])
 def register():
     context = {'legend': 'Регистрация'}
     if current_user.is_authenticated:
-        return redirect(url_for('profile'))
+        return redirect(url_for('.profile'))
 
     form = RegistrationForm()
 
@@ -186,25 +176,25 @@ def register():
                 flash(f'Регистрация аккаунт на email {email} успешно завершена. Можете авторизоваться.', 'success')
             except sqlite3.Error as e:
                 return f'При регистрации возникла ошибка {e}'
-            return redirect(url_for('login_form'))
+            return redirect(url_for('.login_form'))
     return render_template('register.html', context=context, form=form)
 
 
-@app.route('/')
-@app.route('/home')
+@main.route('/')
+@main.route('/home')
 def index():
     context = {'legend': 'Главная'}
     return render_template('index.html', context=context)
 
 
-@app.route('/posts')
+@main.route('/posts')
 def posts():
     context = {'legend': 'Статьи'}
     content = db.session.query(Article, User).filter(Article.author_id == User.id).all()
     return render_template('posts.html', content=content, context=context)
 
 
-@app.route('/posts/<int:id>', methods=['POST', 'GET'])
+@main.route('/posts/<int:id>', methods=['POST', 'GET'])
 def post_detail(id):
     form = None
     context = {'legend': ''}
@@ -217,15 +207,15 @@ def post_detail(id):
                 comment = Comment(text=form.text.data, author_id=current_user.id, article_id=id, date=datetime.now(TIMEZONE))
                 db.session.add(comment)
                 db.session.commit()
-                return redirect(url_for('post_detail', id=id))
+                return redirect(url_for('.post_detail', id=id))
         else:
-            session['next'] = url_for('post_detail', id=id)
-            return redirect(url_for('login_form'))
+            session['next'] = url_for('.post_detail', id=id)
+            return redirect(url_for('.login_form'))
 
     return render_template('post_detail.html', content=content, context=context, form=form)
 
 
-@app.route('/posts/<int:id>/del')
+@main.route('/posts/<int:id>/del')
 @login_required
 def post_delete(id):
     article = Article.query.get_or_404(id)
@@ -240,7 +230,7 @@ def post_delete(id):
         return 'Статью может удалять только автор'
 
 
-@app.route('/comment/<int:id>/del')
+@main.route('/comment/<int:id>/del')
 @login_required
 def comment_delete(id):
     comment = Comment.query.get_or_404(id)
@@ -248,14 +238,14 @@ def comment_delete(id):
         try:
             db.session.delete(comment)
             db.session.commit()
-            return redirect(url_for('post_detail', id=comment.article_id))
+            return redirect(url_for('.post_detail', id=comment.article_id))
         except:
             return 'При удалении комментария произошла ошибка'
     else:
         return 'Комментарий может удалять только автор'
 
 
-@app.route('/create-article', methods=['POST', 'GET'])
+@main.route('/create-article', methods=['POST', 'GET'])
 @login_required
 def create_article():
     context = {'legend': 'Создание статьи'}
@@ -284,7 +274,7 @@ def create_article():
     return render_template('create-article.html', context=context, form=form)
 
 
-@app.route('/posts/<int:id>/update', methods=['POST', 'GET'])
+@main.route('/posts/<int:id>/update', methods=['POST', 'GET'])
 @login_required
 def post_update(id):
     context = {'legend': 'Редактирование статьи'}
@@ -313,11 +303,11 @@ def post_update(id):
         return 'Обновлять статью может только её автор'
 
 
-@app.route("/login_form", methods=["POST", "GET"])
+@main.route("/login_form", methods=["POST", "GET"])
 def login_form():
     context = {'legend': 'Авторизация'}
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('.index'))
 
     form = LoginForm()
 
@@ -329,13 +319,13 @@ def login_form():
             rm = form.remember.data
             login_user(user, remember=rm)
             next = session.pop('next', None)
-            return redirect(request.args.get("next") or next or url_for("index"))
+            return redirect(request.args.get("next") or next or url_for(".index"))
         else:
             flash('Неверный логин или пароль', category='danger')
     return render_template('login_form.html', context=context, form=form)
 
 
-@app.route('/authors', methods=["POST", "GET"])
+@main.route('/authors', methods=["POST", "GET"])
 def authors_page():
     context = {'legend': 'Авторы'}
     authors = db.session.query(User, UserInfo).filter(User.id == UserInfo.id).all()
@@ -343,9 +333,9 @@ def authors_page():
     return render_template('authors.html', context=context, authors=authors)
 
 
-@app.route('/prank/<int:id>')
+@main.route('/prank/<int:id>')
 def prank(id):
     flash('Редачить комменты пока нельзя =(((((', 'danger')
-    return redirect(url_for('post_detail', id=id))
+    return redirect(url_for('.post_detail', id=id))
 
 

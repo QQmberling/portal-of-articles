@@ -15,7 +15,7 @@
                         <div class="signature p-2">
                             <b>Дата: {{ elem[0].date.date().strftime("%d.%m.%y") }}, {{ elem[0].date.time().strftime("%H:%M") }}</b>
                             <br>
-                            Автор: <a href="{{url_for('profile_with_login', login=elem[1].login)}}"><i>{{ elem[1].login }}</i></a>
+                            Автор: <a href="{{url_for('.profile_with_login', login=elem[1].login)}}"><i>{{ elem[1].login }}</i></a>
                         </div>
                     </div>
                 </div>

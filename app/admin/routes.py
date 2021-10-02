@@ -1,12 +1,10 @@
 import os
 import sqlite3
 
-from flask import Blueprint, render_template, url_for, redirect, session, request, flash
+from flask import render_template, url_for, redirect, session, request, flash
 from flask_login import login_required
-
-from blog.classes import Article, User
-
-admin = Blueprint('admin', __name__, template_folder='templates', static_folder='static')
+from . import admin
+from app.classes import Article, User
 
 menu = [{'url': '.index', 'title': 'Панель'},
         {'url': '.listusers', 'title': 'Список пользователей'},

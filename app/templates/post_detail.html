@@ -14,7 +14,7 @@
 {% endwith %}
     <div class="d-flex flex-row bd-highlight mb-3">
         <div class="col-md-auto text-center align-self-top pt-5">
-            <a href="{{url_for('profile_with_login', login=content[1].login)}}">
+            <a href="{{url_for('.profile_with_login', login=content[1].login)}}">
                 <span class="fs-3 fst-italic">{{ content[1].login }}</span>
                 <br>
                 <img class="m-3" style="width:{{ content[1].avatar_width_other() + 2 }}px; height: {{ content[1].avatar_height_other() + 2 }}px" src="{{url_for('static', filename='other_profile_pics/' + content[1].picture_name)}}">
@@ -73,7 +73,7 @@
             {% for comment in content[0].comments %}
                 <div class="d-flex flex-row bd-highlight mb-3">
                     <div class="col-md-auto text-center align-self-center pt-2">
-                        <a href="{{url_for('profile_with_login', login=content[1].login)}}">
+                        <a href="{{url_for('.profile_with_login', login=content[1].login)}}">
                             <span class="fs-3 fst-italic">{{ comment.author.login }}</span>
                             <br>
                             <img class="m-3" style="width:{{ comment.author.avatar_width_other() + 2 }}px; height: {{ comment.author.avatar_height_other() + 2 }}px" src="{{url_for('static', filename='other_profile_pics/' + comment.author.picture_name)}}">
@@ -93,8 +93,8 @@
                                 {% endif %}
                             </div>
                             {% if current_user.id == comment.author_id %}
-                                <a href="{{url_for('comment_delete', id=comment.id)}}" class="btn btn-danger">Удалить</a>
-                                <a href="{{url_for('prank', id=content[0].id)}}" class="btn btn-success">Редактировать</a>
+                                <a href="{{url_for('.comment_delete', id=comment.id)}}" class="btn btn-danger">Удалить</a>
+                                <a href="{{url_for('.prank', id=content[0].id)}}" class="btn btn-success">Редактировать</a>
                             {% endif %}
                         </div>
                     </div>
