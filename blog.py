@@ -6,4 +6,4 @@ from app.database import create_db
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 with app.app_context():
     create_db()
-    app.run()
+
