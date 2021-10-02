@@ -1,1 +1,1 @@
-web: gunicorn blog:APP
+web: gunicorn blog.blog:app

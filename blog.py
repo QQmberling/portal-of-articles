@@ -5,7 +5,7 @@ from app.database import create_db
 
 if __name__ == '__main__':
 
-    APP = create_app(os.getenv('FLASK_CONFIG') or 'default')
-    with APP.app_context():
+    app = create_app(os.getenv('FLASK_CONFIG') or 'default')
+    with app.app_context():
         create_db()
-        APP.run()
+        app.run()
