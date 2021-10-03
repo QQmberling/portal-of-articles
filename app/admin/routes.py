@@ -67,7 +67,7 @@ def logout():
 
     logout_admin()
 
-    return redirect(url_for('index'))
+    return redirect(url_for('main.index'))
 
 
 @admin.route('/list-pubs')

@@ -1,39 +1,34 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileRequired, FileSize
 from wtforms import StringField, SubmitField, BooleanField, PasswordField, TextAreaField, FileField, SelectField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
-
-
-class NotInBanNames(object):
-    def __init__(self):
-        self.list = ['edit']
-
-    def __call__(self, form, field):
-        if field.data in self.list:
-            raise ValidationError('Данный логин занят или недопустим!')
-
-
-class UsernameValidate(object):
-    def __init__(self):
-        self.excluded_chars = " *?!'^+%&;/()=}][{$#№-"
-
-    def __call__(self, form, field):
-        bad_chrs = ''
-        for char in field.data:
-            if char in self.excluded_chars and char not in bad_chrs:
-                bad_chrs += char
-        if len(bad_chrs) > 0:
-            raise ValidationError(
-                f"Символ(ы) \"{bad_chrs}\" недопустим(ы).")
+from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError, Regexp
+from app.classes import User
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField("Имя пользователя: ", validators=[DataRequired("Некорректный логин"), Length(min=4, max=100, message="Имя пользователя должно быть от 4 до 25 символов"), NotInBanNames(), UsernameValidate()])
+    username = StringField("Имя пользователя: ", validators=[DataRequired("Некорректный логин"),
+                                                             Length(min=4,
+                                                                    max=100,
+                                                                    message="Имя пользователя должно\
+                                                                     быть от 4 до 25 символов"),
+                                                             Regexp('^[A-Za-z][A-Za-z0-9_]*$', 0,
+                                                                    'Имя пользователя должо содержать только\
+                                                                    буквы, цифры и нижние подчеркивания.')])
     email = StringField('Email: ', validators=[DataRequired(), Email(message='Некорректный email')])
-    password = PasswordField("Пароль: ", validators=[DataRequired(), Length(min=4, max=100, message="Пароль должен быть от 4 до 100 символов")])
-    confirm_password = PasswordField("Подтверждение пароля", validators=[DataRequired(), EqualTo("password", message='Пароли не совпадают')])
+    password = PasswordField("Пароль: ",
+                             validators=[DataRequired(),
+                                         Length(min=4, max=100, message="Пароль должен быть от 4 до 100 символов")])
+    confirm_password = PasswordField("Подтверждение пароля",
+                                     validators=[DataRequired(), EqualTo("password", message='Пароли не совпадают')])
     submit = SubmitField("Зарегистрироваться")
 
+    def validate_username(self, field):
+        if User.query.filter_by(username=field.data).first() or field.data == 'edit':
+            raise ValidationError('Имя пользователся занято.')
+
+    def validate_email(self, field):
+        if User.query.filter_by(email=field.data.lower()).first():
+            raise ValidationError('Данный email занят.')
 
 class LoginForm(FlaskForm):
     username = StringField("Имя пользователя: ", validators=[DataRequired("Некорректный логин")])

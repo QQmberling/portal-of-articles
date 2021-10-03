@@ -69,7 +69,7 @@ def after_request(response):
 @main.route('/profile')
 @login_required
 def profile():
-    context = {'legend': f'Профиль {current_user.login}'}
+    context = {'legend': f'Профиль {current_user.username}'}
     articles = db.session.query(Article).filter(Article.author_id == current_user.id).all()
     return render_template('profile.html', context=context, articles=articles)
 
@@ -77,8 +77,8 @@ def profile():
 @main.route('/profile/edit', methods=['POST', 'GET'])
 @login_required
 def profile_edit():
-    context = {'legend': f'Профиль {current_user.login}'}
-
+    context = {'legend': f'Профиль {current_user.username}'}
+    print(current_user.email)
     if request.method == 'GET':
         form = UserEditForm(MultiDict({'first_name': current_user.info[0].first_name,
                                        'last_name': current_user.info[0].last_name,
@@ -122,12 +122,12 @@ def profile_edit():
     return render_template('profile_edit.html', context=context, form=form, form2=form2)
 
 
-@main.route('/profile/<string:login>', methods=['POST', 'GET'])
-def profile_with_login(login):
-    if current_user.is_authenticated and current_user.login == login:
+@main.route('/profile/<string:username>', methods=['POST', 'GET'])
+def profile_with_login(username):
+    if current_user.is_authenticated and current_user.username == username:
         return redirect(url_for('.profile'))
-    profile_user = db.session.query(User).filter_by(login=login).first_or_404()
-    context = {'legend': f'Профиль {login}'}
+    profile_user = db.session.query(User).filter_by(username=username).first_or_404()
+    context = {'legend': f'Профиль {username}'}
     return render_template('profile_with_login.html',
                            context=context,
                            profile_user=profile_user)
@@ -149,25 +149,21 @@ def register():
     form = RegistrationForm()
 
     if form.validate_on_submit():
-        login = form.username.data
+        username = form.username.data
         password = form.password.data
         email = form.email.data
-        if User.query.filter_by(login=login).all():
-            flash('Имя пользователся занято', 'danger')
-            return render_template('register.html', context=context, form=form)
-        else:
-            new_user = User(login=login, password=password, date=datetime.now(TIMEZONE))
-            try:
-                db.session.add(new_user)
-                db.session.commit()
-                id = db.session.query(User.id).filter_by(login=login).first()[0]
-                user_info = UserInfo(id=id)
-                db.session.add(user_info)
-                db.session.commit()
-                flash(f'Регистрация аккаунт на email {email} успешно завершена. Можете авторизоваться.', 'success')
-            except sqlite3.Error as e:
-                return f'При регистрации возникла ошибка {e}'
-            return redirect(url_for('.login_form'))
+        new_user = User(username=username, password=password, date=datetime.now(TIMEZONE))
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            id = db.session.query(User.id).filter_by(username=username).first()[0]
+            user_info = UserInfo(id=id)
+            db.session.add(user_info)
+            db.session.commit()
+            flash(f'Регистрация аккаунт на email {email} успешно завершена. Можете авторизоваться.', 'success')
+        except sqlite3.Error as e:
+            return f'При регистрации возникла ошибка {e}'
+        return redirect(url_for('.login_form'))
     return render_template('register.html', context=context, form=form)
 
 
@@ -303,9 +299,9 @@ def login_form():
     form = LoginForm()
 
     if form.validate_on_submit():
-        login = form.username.data
+        username = form.username.data
         password = form.password.data
-        user = User.query.filter_by(login=login).first()
+        user = User.query.filter_by(username=username).first()
         if user and user.verify_password(password):
             rm = form.remember.data
             login_user(user, remember=rm)
