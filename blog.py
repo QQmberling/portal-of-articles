@@ -19,5 +19,4 @@ with app.app_context():
     create_db()
 
 if __name__ == '__main__':
-
     app.run()
