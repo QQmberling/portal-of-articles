@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flask import url_for
 from flask_login import UserMixin
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db, TIMEZONE, ROOT_MAIN_PICTURES, ROOT_OTHER_PICTURES
 from app.image import get_image_size
@@ -25,13 +26,24 @@ class Article(db.Model):
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     login = db.Column(db.String(30), nullable=False, unique=True)
-    password = db.Column(db.String(200), nullable=False)
+    password_hash = db.Column(db.String(128), nullable=False)
     picture_name = db.Column(db.String(20), nullable=False, default='default_male.png')
     date = db.Column(db.DateTime, default=datetime.now(TIMEZONE))
     last_seen = db.Column(db.DateTime, default=datetime.now(TIMEZONE))
 
     def __repr__(self):
         return '<User %r - %r>' % (self.id, self.login)
+
+    @property
+    def password(self):
+        raise AttributeError('Пароль - нечитаемый атрибут!')
+
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
     def avatar_width_other(self):
         return get_image_size(ROOT_OTHER_PICTURES + self.picture_name)[0]

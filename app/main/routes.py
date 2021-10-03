@@ -5,7 +5,6 @@ from datetime import datetime
 from flask import render_template, request, redirect, flash, url_for, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.datastructures import MultiDict
-from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import TIMEZONE, PROFILE_PIC_NAME
 from app.classes import User, Article, UserInfo, Comment
@@ -127,15 +126,11 @@ def profile_edit():
 def profile_with_login(login):
     if current_user.is_authenticated and current_user.login == login:
         return redirect(url_for('.profile'))
-    user = db.session.query(User).filter_by(login=login).first_or_404()
-    if user:
-        profile_user = User.query.get(user.id)
-        context = {'legend': f'Профиль {login}'}
-        return render_template('profile_with_login.html',
-                               context=context,
-                               profile_user=profile_user)
-    else:
-        return f'Пользователь под логином {login} не найден.'
+    profile_user = db.session.query(User).filter_by(login=login).first_or_404()
+    context = {'legend': f'Профиль {login}'}
+    return render_template('profile_with_login.html',
+                           context=context,
+                           profile_user=profile_user)
 
 
 @main.route('/logout', methods=['POST', 'GET'])
@@ -156,16 +151,12 @@ def register():
     if form.validate_on_submit():
         login = form.username.data
         password = form.password.data
-        confirm_password = form.confirm_password.data
         email = form.email.data
-        same_login = User.query.filter_by(login=login).all()
-        if same_login:
+        if User.query.filter_by(login=login).all():
             flash('Имя пользователся занято', 'danger')
             return render_template('register.html', context=context, form=form)
         else:
-            hash_pwd = generate_password_hash(password)
-            new_user = User(login=login, password=hash_pwd, date=datetime.now(TIMEZONE))
-
+            new_user = User(login=login, password=password, date=datetime.now(TIMEZONE))
             try:
                 db.session.add(new_user)
                 db.session.commit()
@@ -315,7 +306,7 @@ def login_form():
         login = form.username.data
         password = form.password.data
         user = User.query.filter_by(login=login).first()
-        if user and check_password_hash(user.password, password):
+        if user and user.verify_password(password):
             rm = form.remember.data
             login_user(user, remember=rm)
             next = session.pop('next', None)
