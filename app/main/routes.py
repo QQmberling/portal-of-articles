@@ -78,12 +78,11 @@ def profile():
 @login_required
 def profile_edit():
     context = {'legend': f'Профиль {current_user.username}'}
-    print(current_user.email)
     if request.method == 'GET':
-        form = UserEditForm(MultiDict({'first_name': current_user.info[0].first_name,
-                                       'last_name': current_user.info[0].last_name,
-                                       'about': current_user.info[0].about,
-                                       'gender': current_user.info[0].gender
+        form = UserEditForm(MultiDict({'first_name': current_user.info.first_name,
+                                       'last_name': current_user.info.last_name,
+                                       'about': current_user.info.about,
+                                       'gender': current_user.info.gender
                                        }))
         form2 = ImageForm()
     else:
@@ -96,10 +95,10 @@ def profile_edit():
         about = form.about.data
         gender = form.gender.data
 
-        current_user.info[0].about = about
-        current_user.info[0].first_name = first_name
-        current_user.info[0].last_name = last_name
-        current_user.info[0].gender = gender
+        current_user.info.about = about
+        current_user.info.first_name = first_name
+        current_user.info.last_name = last_name
+        current_user.info.gender = gender
 
         form2.avatar.data = form.avatar.data
         if form2.validate_on_submit():
@@ -111,7 +110,7 @@ def profile_edit():
                 return render_template('profile_edit.html', context=context, form=form, form2=form2)
 
             if current_user.picture_name == 'default_male.png' or current_user.picture_name == 'default_female.png':
-                if current_user.info[0].gender == 'М':
+                if current_user.info.gender == 'М':
                     current_user.picture_name = 'default_male.png'
                 else:
                     current_user.picture_name = 'default_female.png'
@@ -152,7 +151,7 @@ def register():
         username = form.username.data
         password = form.password.data
         email = form.email.data
-        new_user = User(username=username, password=password, date=datetime.now(TIMEZONE))
+        new_user = User(username=username, password=password, email=email, date=datetime.now(TIMEZONE))
         try:
             db.session.add(new_user)
             db.session.commit()

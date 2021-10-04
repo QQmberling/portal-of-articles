@@ -5,7 +5,7 @@ from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db, TIMEZONE, ROOT_MAIN_PICTURES, ROOT_OTHER_PICTURES
-from app.image import get_image_size
+from app.image import get_image_width, get_image_height
 
 
 class Article(db.Model):
@@ -47,22 +47,22 @@ class User(db.Model, UserMixin):
         return check_password_hash(self.password_hash, password)
 
     def avatar_width_other(self):
-        return get_image_size(ROOT_OTHER_PICTURES + self.picture_name)[0]
+        return get_image_width(f'{ROOT_OTHER_PICTURES}{self.picture_name}')
 
     def avatar_height_other(self):
-        return get_image_size(ROOT_OTHER_PICTURES + self.picture_name)[1]
+        return get_image_height(f'{ROOT_OTHER_PICTURES}{self.picture_name}')
 
     def avatar_width_main(self):
-        return get_image_size(ROOT_MAIN_PICTURES + self.picture_name)[0]
+        return get_image_width(f'{ROOT_MAIN_PICTURES}{self.picture_name}')
 
     def avatar_height_main(self):
-        return get_image_size(ROOT_MAIN_PICTURES + self.picture_name)[1]
+        return get_image_height(f'{ROOT_MAIN_PICTURES}{self.picture_name}')
 
     def url_main_avatar(self):
-        return url_for('static', filename='profile_pics/' + self.picture_name)
+        return url_for('static', filename=f'profile_pics/{self.picture_name}')
 
     def url_other_avatar(self):
-        return url_for('static', filename='other_profile_pics/'+self.picture_name)
+        return url_for('static', filename=f'other_profile_pics/{self.picture_name}')
 
     def count_articles(self):
         return len(self.articles)
@@ -77,7 +77,7 @@ class UserInfo(db.Model):
     last_name = db.Column(db.String(30), nullable=True)
     about = db.Column(db.String(), nullable=True)
     gender = db.Column(db.String(1), default='М')
-    user = db.relationship('User', uselist=False, backref=db.backref('info', lazy=True))
+    user = db.relationship('User', backref=db.backref('info', lazy=True, uselist=False))
 
 
 class Comment(db.Model):

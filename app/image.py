@@ -25,8 +25,15 @@ def scale_image(input_image_path, output_image_path, width=None, height=None, ta
     scaled_image.close()
 
 
-def get_image_size(input_image_path):
+def get_image_width(input_image_path):
     image = Image.open(input_image_path)
-    width, height = image.size
+    width, _ = image.size
     image.close()
-    return width, height
+    return width
+
+
+def get_image_height(input_image_path):
+    image = Image.open(input_image_path)
+    _, height = image.size
+    image.close()
+    return height

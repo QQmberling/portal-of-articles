@@ -30,6 +30,7 @@ class RegistrationForm(FlaskForm):
         if User.query.filter_by(email=field.data.lower()).first():
             raise ValidationError('Данный email занят.')
 
+
 class LoginForm(FlaskForm):
     username = StringField("Имя пользователя: ", validators=[DataRequired("Некорректный логин")])
     password = PasswordField("Пароль: ", validators=[DataRequired("Введите пароль")])

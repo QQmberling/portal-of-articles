@@ -30,7 +30,7 @@
                                 Имя:
                             </div>
                             <div class="col">
-                                {% if current_user.info[0].first_name %}{{ current_user.info[0].first_name }}{% else %}<i>Не указано</i>{% endif %}
+                                {% if current_user.info.first_name %}{{ current_user.info.first_name }}{% else %}<i>Не указано</i>{% endif %}
                             </div>
                         </div>
                     </li>
@@ -40,7 +40,7 @@
                                 Фамилия:
                             </div>
                             <div class="col">
-                                {% if current_user.info[0].last_name %}{{ current_user.info[0].last_name }}{% else %}<i>Не указано</i>{% endif %}
+                                {% if current_user.info.last_name %}{{ current_user.info.last_name }}{% else %}<i>Не указано</i>{% endif %}
                             </div>
                         </div>
                     </li>
@@ -50,7 +50,7 @@
                                 Пол:
                             </div>
                             <div class="col">
-                                {% if current_user.info[0].gender %}<b>{{current_user.info[0].gender}}</b>{% else %}<i>Не указано</i>{% endif %}
+                                {% if current_user.info.gender %}<b>{{ current_user.info.gender }}</b>{% else %}<i>Не указано</i>{% endif %}
                             </div>
                         </div>
                     </li>
