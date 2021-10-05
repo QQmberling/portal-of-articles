@@ -9,8 +9,9 @@ from config import config
 
 TIMEZONE = datetime.timezone(datetime.timedelta(hours=3))  # Таймзона Москвы
 PROFILE_PIC_NAME = 'Profile_pic_'  # Начало для названия картинки аватара. Пример: Profile_pic_1 - аватар первого польз.
-AVATAR_SIZE_MAX = (400, 400)  # Размер аватара для профиля
-AVATAR_SIZE_MIN = (250, 250)  # Размер аватара для страничек типа authors или post/detail
+MAIN_SIZE = (400, 400)  # Размер аватара для профиля
+OTHER_SIZE = (250, 250)  # Размер аватара для страничек типа authors или post/detail
+MIN_SIZE = (200, 200)
 ROOT_MAIN_PICTURES = path.join(path.abspath(path.dirname(__file__)), 'static/profile_pics/')
 ROOT_OTHER_PICTURES = path.join(path.abspath(path.dirname(__file__)), 'static/other_profile_pics/')
 db = SQLAlchemy()

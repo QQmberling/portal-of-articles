@@ -6,9 +6,9 @@ from flask import render_template, request, redirect, flash, url_for, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.datastructures import MultiDict
 
-from app import TIMEZONE, PROFILE_PIC_NAME
+from app import TIMEZONE, PROFILE_PIC_NAME, MIN_SIZE
 from app.classes import User, Article, UserInfo, Comment
-from app.image import scale_image
+from app.image import scale_image, validate_image_size
 from . import main
 from .forms import LoginForm, RegistrationForm, ArticleCreateForm, ArticleEditForm, UserEditForm, ImageForm, \
     CreateCommentForm
@@ -31,16 +31,19 @@ def save_image(picture_file):
     temp_path = os.path.join(main.root_path, '../static/temp_pics', picture_name)
     picture_file.save(temp_path)
 
-    picture_path = os.path.join(main.root_path, '../static/profile_pics', picture_name)  # Путь для картинки профиля (для отображения в профиле)
-    picture_path2 = os.path.join(main.root_path, '../static/other_profile_pics', picture_name)  # Путь для картинки профиля уменьшенной версии (для остального)
+    if validate_image_size(temp_path):
+        picture_path = os.path.join(main.root_path, '../static/profile_pics',
+                                    picture_name)  # Путь для картинки профиля (для отображения в профиле)
+        picture_path2 = os.path.join(main.root_path, '../static/other_profile_pics',
+                                     picture_name)  # Путь для картинки профиля уменьшенной версии (для остального)
 
-    scale_image(temp_path, picture_path, target=True)
-    scale_image(temp_path, picture_path2, target=False)
+        scale_image(temp_path, picture_path, target=True)
+        scale_image(temp_path, picture_path2, target=False)
+    else:
+        picture_name = None
 
     if os.path.isfile(temp_path):
         os.remove(temp_path)
-    else:
-        print("File doesn't exists!")
 
     return picture_name
 
@@ -48,11 +51,6 @@ def save_image(picture_file):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
-
-
-# @main.before_first_request
-# def before_first_request():
-#     pass
 
 
 @main.before_request
@@ -103,7 +101,11 @@ def profile_edit():
         form2.avatar.data = form.avatar.data
         if form2.validate_on_submit():
             picture_name = save_image(form.avatar.data)
-            current_user.picture_name = picture_name
+            if picture_name:
+                current_user.picture_name = picture_name
+            else:
+                flash(f'Изображение слишком маленькое. Минимальное разрешение: {MIN_SIZE}', 'danger')
+                return render_template('profile_edit.html', context=context, form=form, form2=form2)
         else:
             if form2.avatar.data.stream.name is not None:
                 flash('Аватар не соответствует требованиям.', 'danger')

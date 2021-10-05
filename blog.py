@@ -6,6 +6,7 @@ from app.classes import User, UserInfo, Comment, Article
 
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 migrate = Migrate(app, db)
 
 
