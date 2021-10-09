@@ -4,6 +4,7 @@ from datetime import datetime
 
 from flask import render_template, request, redirect, flash, url_for, session
 from flask_login import login_user, logout_user, login_required, current_user
+from sqlalchemy import func
 from werkzeug.datastructures import MultiDict
 
 from app import TIMEZONE, PROFILE_PIC_NAME, MIN_SIZE
@@ -13,15 +14,6 @@ from . import main
 from .forms import LoginForm, RegistrationForm, ArticleCreateForm, ArticleEditForm, UserEditForm, ImageForm, \
     CreateCommentForm
 from .. import db, login_manager
-
-
-def sort_authors(authors):
-    N = len(authors)
-    for i in range(N-1):
-        for j in range(N-i-1):
-            if len(authors[j][0].articles) < len(authors[j+1][0].articles):
-                authors[j], authors[j+1] = authors[j+1], authors[j]
-    return authors
 
 
 def save_image(picture_file):
@@ -123,7 +115,7 @@ def profile_edit():
     return render_template('profile_edit.html', context=context, form=form, form2=form2)
 
 
-@main.route('/profile/<string:username>', methods=['POST', 'GET'])
+@main.route('/profile/<string:username>')
 def profile_with_login(username):
     if current_user.is_authenticated and current_user.username == username:
         return redirect(url_for('.profile'))
@@ -132,7 +124,7 @@ def profile_with_login(username):
     return render_template('profile_with_login.html', context=context)
 
 
-@main.route('/logout', methods=['POST', 'GET'])
+@main.route('/logout')
 @login_required
 def logout():
     logout_user()
@@ -307,10 +299,13 @@ def login_form():
     return render_template('login_form.html', context=context, form=form)
 
 
-@main.route('/authors', methods=["POST", "GET"])
+@main.route('/authors')
 def authors_page():
-    authors = db.session.query(User, UserInfo).filter(User.id == UserInfo.id).all()
-    authors = sort_authors(authors)
+    # full_query = db.session.query(User.username, func.count(Article.id)).group_by(Article.author_id).join(User, Article.author_id == User.id).order_by(func.count(Article.id).desc()).all()
+
+    subquery = db.session.query(Article.author_id, func.count(Article.id).label('count')).group_by(Article.author_id).subquery()
+    authors = User.query.join(subquery, subquery.c.author_id == User.id).order_by(subquery.c.count.desc()).all()
+
     context = {'legend': 'Авторы', 'authors': authors}
     return render_template('authors.html', context=context)
 

@@ -6,16 +6,16 @@
         {% for author in context.authors %}
             <div class="d-flex flex-row bd-highlight mb-3">
                 <div class=" col-md-auto text-center pt-2">
-                    <a href="{{ author[0].url_profile() }}">
-                        <span class="fs-3 fst-italic">{{ author[0].username }}</span>
+                    <a href="{{ author.url_profile() }}">
+                        <span class="fs-3 fst-italic">{{ author.username }}</span>
                         <br>
-                        <img class="m-3" style="width:{{ author[0].avatar_width_other() + 2 }}px; height: {{ author[0].avatar_height_other() + 2 }}px" src="{{ author[0].src_other_avatar() }}">
+                        <img class="m-3" style="width:{{ author.avatar_width_other() + 2 }}px; height: {{ author.avatar_height_other() + 2 }}px" src="{{ author.src_other_avatar() }}">
                     </a>
                     <br>
                     <div class="left-buttons px-3">
-                    Дата регистрации: {{ author[0].date.date().strftime("%d.%m.%y") }}, {{ author[0].date.time().strftime("%H:%M") }}
+                    Дата регистрации: {{ author.date.date().strftime("%d.%m.%y") }}, {{ author.date.time().strftime("%H:%M") }}
                     <br>
-                    Написано статей: {{ author[0].articles|length }}
+                    Написано статей: {{ author.articles|length }}
                     </div>
                 </div>
 
@@ -23,7 +23,7 @@
                     <div class="fs-5 about-text bubble" style="margin: 50px">
                         <div class="bubble-in">
                         <pre>
-{% if author[1].about %}{{ author[1].about }}{% else %}<div class="text-dark">Пользователь ничего не рассказал нам о себе =( </div>{% endif %}
+{% if author.info.about %}{{ author.info.about }}{% else %}<div class="text-dark">Пользователь ничего не рассказал нам о себе =( </div>{% endif %}
                         </pre>
                         </div>
                     </div>
