@@ -14,10 +14,10 @@
 {% endwith %}
     <div class="d-flex flex-row bd-highlight mb-3">
         <div class="col-md-auto text-center align-self-top pt-5">
-            <a href="{{url_for('.profile_with_login', username=content[1].username)}}">
+            <a href="{{ content[1].url_profile() }}">
                 <span class="fs-3 fst-italic">{{ content[1].username }}</span>
                 <br>
-                <img class="m-3" style="width:{{ content[1].avatar_width_other() + 2 }}px; height: {{ content[1].avatar_height_other() + 2 }}px" src="{{url_for('static', filename='other_profile_pics/' + content[1].picture_name)}}">
+                <img class="m-3" style="width:{{ content[1].avatar_width_other() + 2 }}px; height: {{ content[1].avatar_height_other() + 2 }}px" src="{{ content[1].src_other_avatar() }}">
             </a>
             <div class="left-buttons px-3">
              Дата регистрации: {{ content[1].date.date().strftime("%d.%m.%y") }}, {{ content[1].date.time().strftime("%H:%M") }}
@@ -73,10 +73,10 @@
             {% for comment in content[0].comments %}
                 <div class="d-flex flex-row bd-highlight mb-3">
                     <div class="col-md-auto text-center align-self-center pt-2">
-                        <a href="{{url_for('.profile_with_login', username=content[1].username)}}">
+                        <a href="{{ content[1].url_profile() }}">
                             <span class="fs-3 fst-italic">{{ comment.author.username }}</span>
                             <br>
-                            <img class="m-3" style="width:{{ comment.author.avatar_width_other() + 2 }}px; height: {{ comment.author.avatar_height_other() + 2 }}px" src="{{url_for('static', filename='other_profile_pics/' + comment.author.picture_name)}}">
+                            <img class="m-3" style="width:{{ comment.author.avatar_width_other() + 2 }}px; height: {{ comment.author.avatar_height_other() + 2 }}px" src="{{ comment.author.src_other_avatar() }}">
                         </a>
                         <br>
                             Дата регистрации: {{ comment.author.date.date().strftime("%d.%m.%y") }}, {{ comment.author.date.time().strftime("%H:%M") }}

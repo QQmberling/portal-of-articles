@@ -6,10 +6,10 @@
         {% for author in authors %}
             <div class="d-flex flex-row bd-highlight mb-3">
                 <div class=" col-md-auto text-center pt-2">
-                    <a href="{{url_for('.profile_with_login', username=author[0].username)}}">
+                    <a href="{{ author[0].url_profile() }}">
                         <span class="fs-3 fst-italic">{{ author[0].username }}</span>
                         <br>
-                        <img class="m-3" style="width:{{ author[0].avatar_width_other() + 2 }}px; height: {{ author[0].avatar_height_other() + 2 }}px" src="{{url_for('static', filename='other_profile_pics/' + author[0].picture_name)}}">
+                        <img class="m-3" style="width:{{ author[0].avatar_width_other() + 2 }}px; height: {{ author[0].avatar_height_other() + 2 }}px" src="{{ author[0].src_other_avatar() }}">
                     </a>
                     <br>
                     <div class="left-buttons px-3">

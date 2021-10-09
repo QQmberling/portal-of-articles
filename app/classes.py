@@ -46,6 +46,21 @@ class User(db.Model, UserMixin):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def count_articles(self):
+        return len(self.articles)
+
+    def count_comments(self):
+        return len(self.comments)
+
+    def url_profile(self):
+        return url_for('.profile_with_login', username=self.username)
+
+    def src_other_avatar(self):
+        return url_for('static', filename='other_profile_pics/' + self.picture_name)
+
+    def src_main_avatar(self):
+        return url_for('static', filename='main_profile_pics/' + self.picture_name)
+
     def avatar_width_other(self):
         return get_image_width(f'{ROOT_OTHER_PICTURES}{self.picture_name}')
 
@@ -63,12 +78,6 @@ class User(db.Model, UserMixin):
 
     def url_other_avatar(self):
         return url_for('static', filename=f'other_profile_pics/{self.picture_name}')
-
-    def count_articles(self):
-        return len(self.articles)
-
-    def count_comments(self):
-        return len(self.comments)
 
 
 class UserInfo(db.Model):
