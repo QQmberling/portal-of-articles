@@ -185,6 +185,7 @@ def post_detail(id):
                 db.session.commit()
                 return redirect(url_for('.post_detail', id=id))
         else:
+            flash('Необходимо авторизоваться.', 'danger')
             session['next'] = url_for('.post_detail', id=id)
             return redirect(url_for('.login_form'))
     context = {'legend': '', 'article': article}
