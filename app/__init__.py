@@ -12,8 +12,7 @@ PROFILE_PIC_NAME = 'Profile_pic_'  # Начало для названия кар
 MAIN_SIZE = (400, 400)  # Размер аватара для профиля
 OTHER_SIZE = (250, 250)  # Размер аватара для страничек типа authors или post/detail
 MIN_SIZE = (200, 200)
-ROOT_MAIN_PICTURES = path.join(path.abspath(path.dirname(__file__)), 'static/profile_pics/')
-ROOT_OTHER_PICTURES = path.join(path.abspath(path.dirname(__file__)), 'static/other_profile_pics/')
+APP_ROOT = path.abspath(path.dirname(__file__))
 db = SQLAlchemy()
 bootstrap = Bootstrap()
 

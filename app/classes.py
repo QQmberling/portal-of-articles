@@ -1,11 +1,12 @@
+import os
 from datetime import datetime
 
 from flask import url_for
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app import db, TIMEZONE, ROOT_MAIN_PICTURES, ROOT_OTHER_PICTURES
-from app.image import get_image_width, get_image_height
+from app import db, TIMEZONE, APP_ROOT
+from app.image import get_image_width, get_image_height, save_image
 
 
 class Article(db.Model):
@@ -62,22 +63,25 @@ class User(db.Model, UserMixin):
         return url_for('static', filename='main_profile_pics/' + self.picture_name)
 
     def avatar_width_other(self):
-        return get_image_width(f'{ROOT_OTHER_PICTURES}{self.picture_name}')
+        return get_image_width(os.path.join(APP_ROOT, 'static/other_profile_pics', self.picture_name))
 
     def avatar_height_other(self):
-        return get_image_height(f'{ROOT_OTHER_PICTURES}{self.picture_name}')
+        return get_image_height(os.path.join(APP_ROOT, 'static/other_profile_pics', self.picture_name))
 
     def avatar_width_main(self):
-        return get_image_width(f'{ROOT_MAIN_PICTURES}{self.picture_name}')
+        return get_image_width(os.path.join(APP_ROOT, 'static/profile_pics', self.picture_name))
 
     def avatar_height_main(self):
-        return get_image_height(f'{ROOT_MAIN_PICTURES}{self.picture_name}')
+        return get_image_height(os.path.join(APP_ROOT, 'static/profile_pics', self.picture_name))
 
     def url_main_avatar(self):
         return url_for('static', filename=f'profile_pics/{self.picture_name}')
 
     def url_other_avatar(self):
         return url_for('static', filename=f'other_profile_pics/{self.picture_name}')
+
+    def save_avatar(self, picture_file):
+        return save_image(self.id, picture_file)
 
 
 class UserInfo(db.Model):

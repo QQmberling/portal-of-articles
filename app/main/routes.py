@@ -1,4 +1,3 @@
-import os
 import sqlite3
 from datetime import datetime
 
@@ -7,37 +6,12 @@ from flask_login import login_user, logout_user, login_required, current_user
 from sqlalchemy import func
 from werkzeug.datastructures import MultiDict
 
-from app import TIMEZONE, PROFILE_PIC_NAME, MIN_SIZE
+from app import TIMEZONE, MIN_SIZE
 from app.classes import User, Article, UserInfo, Comment
-from app.image import scale_image, validate_image_size
 from . import main
 from .forms import LoginForm, RegistrationForm, ArticleCreateForm, ArticleEditForm, UserEditForm, ImageForm, \
     CreateCommentForm
 from .. import db, login_manager
-
-
-def save_image(picture_file):
-    picture_ext = f".{picture_file.filename.split('.')[-1]}"
-    picture_name = f'{PROFILE_PIC_NAME}{str(current_user.id)}{picture_ext}'
-
-    temp_path = os.path.join(main.root_path, '../static/temp_pics', picture_name)
-    picture_file.save(temp_path)
-
-    if validate_image_size(temp_path):
-        picture_path = os.path.join(main.root_path, '../static/profile_pics',
-                                    picture_name)  # Путь для картинки профиля (для отображения в профиле)
-        picture_path2 = os.path.join(main.root_path, '../static/other_profile_pics',
-                                     picture_name)  # Путь для картинки профиля уменьшенной версии (для остального)
-
-        scale_image(temp_path, picture_path, target=True)
-        scale_image(temp_path, picture_path2, target=False)
-    else:
-        picture_name = None
-
-    if os.path.isfile(temp_path):
-        os.remove(temp_path)
-
-    return picture_name
 
 
 @login_manager.user_loader
@@ -92,7 +66,7 @@ def profile_edit():
 
         form2.avatar.data = form.avatar.data
         if form2.validate_on_submit():
-            picture_name = save_image(form.avatar.data)
+            picture_name = current_user.save_avatar(form.avatar.data)
             if picture_name:
                 current_user.picture_name = picture_name
             else:

@@ -1,6 +1,8 @@
+import os
+
 from PIL import Image
 
-from app import MAIN_SIZE, OTHER_SIZE, MIN_SIZE
+from app import MAIN_SIZE, OTHER_SIZE, MIN_SIZE, PROFILE_PIC_NAME, APP_ROOT
 
 
 def scale_image(input_image_path, output_image_path, width=None, height=None, target=True):
@@ -48,3 +50,27 @@ def validate_image_size(input_image_path):
         return False
     else:
         return True
+
+
+def save_image(id, picture_file):
+    picture_ext = f".{picture_file.filename.split('.')[-1]}"
+    picture_name = f'{PROFILE_PIC_NAME}{str(id)}{picture_ext}'
+
+    temp_path = os.path.join(APP_ROOT, 'static/temp_pics', picture_name)
+    picture_file.save(temp_path)
+
+    if validate_image_size(temp_path):
+        picture_path = os.path.join(APP_ROOT, 'static/profile_pics',
+                                    picture_name)  # Путь для картинки профиля (для отображения в профиле)
+        picture_path2 = os.path.join(APP_ROOT, 'static/other_profile_pics',
+                                     picture_name)  # Путь для картинки профиля уменьшенной версии (для остального)
+
+        scale_image(temp_path, picture_path, target=True)
+        scale_image(temp_path, picture_path2, target=False)
+    else:
+        picture_name = None
+
+    if os.path.isfile(temp_path):
+        os.remove(temp_path)
+
+    return picture_name
