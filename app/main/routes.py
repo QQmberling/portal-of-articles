@@ -197,6 +197,7 @@ def post_delete(id):
     article = Article.query.get_or_404(id)
     if current_user.id == article.author_id:
         try:
+            db.session.query(Comment).filter(Comment.article_id == article.id).delete()
             db.session.delete(article)
             db.session.commit()
             return redirect('/posts')

@@ -74,7 +74,7 @@
             {% for comment in article.comments %}
                 <div class="d-flex flex-row bd-highlight mb-3">
                     <div class="col-md-auto text-center align-self-center pt-2">
-                        <a href="{{ article.author.url_profile() }}">
+                        <a href="{{ comment.author.url_profile() }}">
                             <span class="fs-3 fst-italic">{{ comment.author.username }}</span>
                             <br>
                             <img class="m-3" style="width:{{ comment.author.avatar_width_other() + 2 }}px; height: {{ comment.author.avatar_height_other() + 2 }}px" src="{{ comment.author.src_other_avatar() }}">
