@@ -64,8 +64,8 @@
         <br>
             <legend class='text-center text-info display-10'>Статьи пользователя</legend>
             <div class="container">
-                {% if articles|length > 0 %}
-                    {% for el in articles %}
+                {% if context.articles|length > 0 %}
+                    {% for el in context.articles %}
                         <div class="alert alert-info">
                             <h2>{{ el.title }}</h2>
                             <p>{{ el.intro }}</p>

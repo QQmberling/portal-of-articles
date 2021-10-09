@@ -12,41 +12,42 @@
 {% endfor %}
 {% endif %}
 {% endwith %}
+    {% set article = context.article %}
     <div class="d-flex flex-row bd-highlight mb-3">
         <div class="col-md-auto text-center align-self-top pt-5">
-            <a href="{{ content[1].url_profile() }}">
-                <span class="fs-3 fst-italic">{{ content[1].username }}</span>
+            <a href="{{ article.author.url_profile() }}">
+                <span class="fs-3 fst-italic">{{ article.author.username }}</span>
                 <br>
-                <img class="m-3" style="width:{{ content[1].avatar_width_other() + 2 }}px; height: {{ content[1].avatar_height_other() + 2 }}px" src="{{ content[1].src_other_avatar() }}">
+                <img class="m-3" style="width:{{ article.author.avatar_width_other() + 2 }}px; height: {{ article.author.avatar_height_other() + 2 }}px" src="{{ article.author.src_other_avatar() }}">
             </a>
             <div class="left-buttons px-3">
-             Дата регистрации: {{ content[1].date.date().strftime("%d.%m.%y") }}, {{ content[1].date.time().strftime("%H:%M") }}
+             Дата регистрации: {{ article.author.date.date().strftime("%d.%m.%y") }}, {{ article.author.date.time().strftime("%H:%M") }}
             <br>
-            Написано статей: {{ content[1].articles|length }}
+            Написано статей: {{ article.author.articles|length }}
             </div>
         </div>
     <div class="col">
-        <h1 class="text-center">{{ content[0].title }}</h1>
+        <h1 class="text-center">{{ article.title }}</h1>
         <div class="alert alert-info">
-            <pre class="fs-5" style="text-align: justify">{{ content[0].text }}</pre>
+            <pre class="fs-5" style="text-align: justify">{{ article.text }}</pre>
             <div class="signature">
-                <b>Дата: {{ content[0].date.date().strftime("%d.%m.%y") }}, {{ content[0].date.time().strftime("%H:%M") }}</b>
-                {% if content[0].edit_date != None %}
-                    <p class="fa-bold"><b>Редактировалось: {{ content[0].edit_date.date().strftime("%d.%m.%y") }}, {{ content[0].edit_date.time().strftime("%H:%M") }}</b></p>
+                <b>Дата: {{ article.date.date().strftime("%d.%m.%y") }}, {{ article.date.time().strftime("%H:%M") }}</b>
+                {% if article.edit_date != None %}
+                    <p class="fa-bold"><b>Редактировалось: {{ article.edit_date.date().strftime("%d.%m.%y") }}, {{ article.edit_date.time().strftime("%H:%M") }}</b></p>
                 {% endif %}
             </div>
             <div class="row">
-                {% if content[0].able_to_comment %}
+                {% if article.able_to_comment %}
                     <div class="col left-buttons">
                         <form action="" method="POST">
                             <button href=# class="btn btn-primary">Оставить комментарий</button>
                         </form>
                     </div>
                 {% endif %}
-                {% if current_user.id == content[0].author_id %}
+                {% if current_user.id == article.author_id %}
                     <div class="col right-buttons">
-                        <a href="/posts/{{ content[0].id }}/del" class="btn btn-danger">Удалить</a>
-                        <a href="/posts/{{ content[0].id}}/update" class="btn btn-success">Редактировать</a>
+                        <a href="/posts/{{ article.id }}/del" class="btn btn-danger">Удалить</a>
+                        <a href="/posts/{{ article.id}}/update" class="btn btn-success">Редактировать</a>
                     </div>
                 {% endif %}
             </div>
@@ -63,17 +64,17 @@
             </div>
             {% endif %}
         </form>
-    {% if content[0].able_to_comment %}
-        {% if content[0].comments|length != 0 %}
+    {% if article.able_to_comment %}
+        {% if article.comments|length != 0 %}
         <div class="container w-50 mt-3">
             <fieldset class="form-group">
                 <legend class='border-bottom mb-4 display-6'>Комментарии</legend>
             </fieldset>
         </div>
-            {% for comment in content[0].comments %}
+            {% for comment in article.comments %}
                 <div class="d-flex flex-row bd-highlight mb-3">
                     <div class="col-md-auto text-center align-self-center pt-2">
-                        <a href="{{ content[1].url_profile() }}">
+                        <a href="{{ article.author.url_profile() }}">
                             <span class="fs-3 fst-italic">{{ comment.author.username }}</span>
                             <br>
                             <img class="m-3" style="width:{{ comment.author.avatar_width_other() + 2 }}px; height: {{ comment.author.avatar_height_other() + 2 }}px" src="{{ comment.author.src_other_avatar() }}">
@@ -93,8 +94,8 @@
                                 {% endif %}
                             </div>
                             {% if current_user.id == comment.author_id %}
-                                <a href="{{url_for('.comment_delete', id=comment.id)}}" class="btn btn-danger">Удалить</a>
-                                <a href="{{url_for('.prank', id=content[0].id)}}" class="btn btn-success">Редактировать</a>
+                                <a href="{{ comment.delete() }}" class="btn btn-danger">Удалить</a>
+                                <a href="{{ comment.edit() }}" class="btn btn-success">Редактировать</a>
                             {% endif %}
                         </div>
                     </div>

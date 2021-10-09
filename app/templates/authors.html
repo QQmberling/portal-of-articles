@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container-fluid" >
     <div class="container" style="width: 50%">
-        {% for author in authors %}
+        {% for author in context.authors %}
             <div class="d-flex flex-row bd-highlight mb-3">
                 <div class=" col-md-auto text-center pt-2">
                     <a href="{{ author[0].url_profile() }}">

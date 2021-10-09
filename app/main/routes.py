@@ -67,9 +67,9 @@ def after_request(response):
 @main.route('/profile')
 @login_required
 def profile():
-    context = {'legend': f'Профиль {current_user.username}'}
     articles = db.session.query(Article).filter(Article.author_id == current_user.id).all()
-    return render_template('profile.html', context=context, articles=articles)
+    context = {'legend': f'Профиль {current_user.username}', 'articles': articles}
+    return render_template('profile.html', context=context)
 
 
 @main.route('/profile/edit', methods=['POST', 'GET'])
@@ -128,10 +128,8 @@ def profile_with_login(username):
     if current_user.is_authenticated and current_user.username == username:
         return redirect(url_for('.profile'))
     profile_user = db.session.query(User).filter_by(username=username).first_or_404()
-    context = {'legend': f'Профиль {username}'}
-    return render_template('profile_with_login.html',
-                           context=context,
-                           profile_user=profile_user)
+    context = {'legend': f'Профиль {username}', 'profile_user': [profile_user]}
+    return render_template('profile_with_login.html', context=context)
 
 
 @main.route('/logout', methods=['POST', 'GET'])
@@ -177,17 +175,15 @@ def index():
 
 @main.route('/posts')
 def posts():
-    context = {'legend': 'Статьи'}
-    content = db.session.query(Article, User).filter(Article.author_id == User.id).all()
-    return render_template('posts.html', content=content, context=context)
+    articles = db.session.query(Article).all()
+    context = {'legend': 'Статьи', 'articles': articles}
+    return render_template('posts.html', context=context)
 
 
 @main.route('/posts/<int:id>', methods=['POST', 'GET'])
 def post_detail(id):
     form = None
-    context = {'legend': ''}
-    content = db.session.query(Article, User).filter(Article.id == id).filter(Article.author_id == User.id).first_or_404()
-
+    article = db.session.query(Article).filter(Article.id == id).first_or_404()
     if request.method == 'POST':
         if current_user.is_authenticated:
             form = CreateCommentForm()
@@ -199,8 +195,8 @@ def post_detail(id):
         else:
             session['next'] = url_for('.post_detail', id=id)
             return redirect(url_for('.login_form'))
-
-    return render_template('post_detail.html', content=content, context=context, form=form)
+    context = {'legend': '', 'article': article}
+    return render_template('post_detail.html', context=context, form=form)
 
 
 @main.route('/posts/<int:id>/del')
@@ -236,10 +232,7 @@ def comment_delete(id):
 @main.route('/create-article', methods=['POST', 'GET'])
 @login_required
 def create_article():
-    context = {'legend': 'Создание статьи'}
-
     form = ArticleCreateForm()
-
     if form.validate_on_submit():
         title = form.title.data
         intro = form.intro.data
@@ -259,6 +252,7 @@ def create_article():
             return redirect('/posts')
         except:
             return 'При добавлении статьи возникла ошибка'
+    context = {'legend': 'Создание статьи'}
     return render_template('create-article.html', context=context, form=form)
 
 
@@ -315,10 +309,10 @@ def login_form():
 
 @main.route('/authors', methods=["POST", "GET"])
 def authors_page():
-    context = {'legend': 'Авторы'}
     authors = db.session.query(User, UserInfo).filter(User.id == UserInfo.id).all()
     authors = sort_authors(authors)
-    return render_template('authors.html', context=context, authors=authors)
+    context = {'legend': 'Авторы', 'authors': authors}
+    return render_template('authors.html', context=context)
 
 
 @main.route('/prank/<int:id>')

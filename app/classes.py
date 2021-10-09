@@ -98,3 +98,9 @@ class Comment(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     source = db.relationship('Article', backref=db.backref('comments', lazy=True))
     author = db.relationship('User', backref=db.backref('comments', lazy=True))
+
+    def delete(self):
+        return url_for('.comment_delete', id=self.id)
+
+    def edit(self):
+        return url_for('.prank', id=self.id)
