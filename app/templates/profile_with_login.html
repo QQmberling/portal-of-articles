@@ -63,9 +63,9 @@
             </div>
         </div>
         <br>
+        {% if user.articles|length > 0 %}
             <legend class='text-center text-info display-10'>Статьи пользователя</legend>
             <div class="container">
-                {% if user.articles|length > 0 %}
                     {% for el in user.articles %}
                         <div class="alert alert-info">
                             <h2>{{ el.title }}</h2>
@@ -74,10 +74,8 @@
                             <a href="/posts/{{ el.id }}" class="btn btn-warning">Детальнее</a>
                         </div>
                     {% endfor %}
-                    {% else %}
-                    <p>...</p>
-                {% endif %}
             </div>
+        {% endif %}
     </div>
 </div>
 {% endfor %}
