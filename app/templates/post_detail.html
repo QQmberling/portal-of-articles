@@ -18,7 +18,7 @@
             <a href="{{ article.author.url_profile() }}">
                 <span class="fs-3 fst-italic">{{ article.author.username }}</span>
                 <br>
-                <img class="m-3" style="width:{{ article.author.avatar_width_other() + 2 }}px; height: {{ article.author.avatar_height_other() + 2 }}px" src="{{ article.author.src_other_avatar() }}">
+                <img class="avatar thumb m-2" src="{{ article.author.url_avatar() }}">
             </a>
             <div class="left-buttons px-3">
              Дата регистрации: {{ article.author.date.date().strftime("%d.%m.%y") }}, {{ article.author.date.time().strftime("%H:%M") }}
@@ -77,7 +77,7 @@
                         <a href="{{ comment.author.url_profile() }}">
                             <span class="fs-3 fst-italic">{{ comment.author.username }}</span>
                             <br>
-                            <img class="m-3" style="width:{{ comment.author.avatar_width_other() + 2 }}px; height: {{ comment.author.avatar_height_other() + 2 }}px" src="{{ comment.author.src_other_avatar() }}">
+                            <img class="avatar thumb m-2" src="{{ comment.author.url_avatar() }}">
                         </a>
                         <br>
                             Дата регистрации: {{ comment.author.date.date().strftime("%d.%m.%y") }}, {{ comment.author.date.time().strftime("%H:%M") }}

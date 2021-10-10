@@ -29,7 +29,7 @@
             <div class="col">
                 {{ form.hidden_tag() }}
                 <div class="d-flex justify-content-center">
-                    <img class="m-3" style="width:{{ current_user.avatar_width_main() + 2 }}px; height: {{ current_user.avatar_height_main() + 2 }}px" src="{{current_user.url_main_avatar()}}">
+                    <img class="avatar m-2" src="{{ current_user.url_avatar() }}">
                 </div>
                 <p class="text-center px-3">{{form.avatar(class='form-control-file')}}</p>
             </div>
