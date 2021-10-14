@@ -1,29 +1,43 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container" style="width: 50%" >
-        {% if context.articles|length != 0 %}
-            {% for article in context.articles %}
-                <div class="col">
-                    <div class="alert alert-info">
-                       <a href="/posts/{{ article.id }}">
-                           <span class="text-center"><h2>{{ article.title }}</h2></span>
-                           <div class="col-6 intro fs-4 m-3">
-<pre>{{ article.intro }}</pre>
-                           </div>
-                       </a>
-                        <div class="signature p-2">
-                            <b>Дата: {{ article.date.date().strftime("%d.%m.%y") }}, {{ article.date.time().strftime("%H:%M") }}</b>
-                            <br>
-                            Автор: <a href="{{ article.author.url_profile() }}"><i>{{ article.author.username }}</i></a>
-                        </div>
-                    </div>
-                </div>
+<div class="container" style="width: 45%">
+    {% if context.articles|length != 0 %}
+    {% for article in context.articles %}
+    <div class="alert alert-info">
+        <a href="/posts/{{ article.id }}">
+            <span class="text-center"><h2>{{ article.title }}</h2></span>
+        </a>
+        <div class="d-flex justify-content-center">
+            <div class="row fs-5 m-3" style="width: 80%">
+                <p class="text intro">{{ article.intro }}</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
 
-            {% endfor %}
-        {% else %}
-        <p>У нас еще нет статей на сайте</p>
-        {% endif %}
+            </div>
+            <div class="col text-center">
+                <a href="/posts/{{ article.id }}">
+                    <p class="fs-4 text-primary">Читать далее...</p>
+                </a>
+            </div>
+
+            <div class="col right-buttons">
+                <p>
+                    <b>Дата: {{ article.date.date().strftime("%d.%m.%y") }}, {{ article.date.time().strftime("%H:%M") }}
+                        <br>
+                        Автор: <a href="{{ article.author.url_profile() }}"><i>{{ article.author.username }}</i></a>
+                    </b>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {% endfor %}
+    {% else %}
+    <p>У нас еще нет статей на сайте</p>
+    {% endif %}
 </div>
 {{super()}}
 {% endblock %}

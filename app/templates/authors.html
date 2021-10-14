@@ -1,34 +1,32 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container-fluid" >
+<div class="container-fluid">
     <div class="container" style="width: 50%">
         {% for author in context.authors %}
-            <div class="d-flex flex-row bd-highlight mb-3">
-                <div class=" col-md-auto text-center pt-2">
-                    <a href="{{ author.url_profile() }}">
-                        <span class="fs-3 fst-italic">{{ author.username }}</span>
-                        <br>
-                        <img class="avatar thumb m-2" src="{{ author.url_avatar() }}">
-                    </a>
+        <div class="d-flex flex-row bd-highlight mb-3">
+            <div class=" col-md-auto text-center pt-2">
+                <a href="{{ author.url_profile() }}">
+                    <span class="fs-3 fst-italic">{{ author.username }}</span>
                     <br>
-                    <div class="left-buttons px-3">
-                    Дата регистрации: {{ author.date.date().strftime("%d.%m.%y") }}, {{ author.date.time().strftime("%H:%M") }}
+                    <img class="avatar thumb m-2" src="{{ author.url_avatar() }}">
+                </a>
+                <br>
+                <div class="px-3">
+                    Дата регистрации: {{ author.date.date().strftime("%d.%m.%y") }}, {{
+                    author.date.time().strftime("%H:%M") }}
                     <br>
                     Написано статей: {{ author.articles|length }}
-                    </div>
                 </div>
-
-                <div class="col">
-                    <div class="fs-5 about-text bubble" style="margin: 50px">
-                        <div class="bubble-in">
-                        <pre>
-{% if author.info.about %}{{ author.info.about }}{% else %}<div class="text-dark">Пользователь ничего не рассказал нам о себе =( </div>{% endif %}
-                        </pre>
-                        </div>
+            </div>
+            <div class="col">
+                <div class="fs-5 text about bubble" style="margin: 50px">
+                    <div class="bubble-in">
+                        <p class="text">{% if author.info.about %}{{ author.info.about }}{% else %}<i>Пользователь ничего не рассказал нам о себе =( {% endif %}</i></p>
                     </div>
                 </div>
             </div>
+        </div>
         {% endfor %}
     </div>
 </div>

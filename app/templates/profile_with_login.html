@@ -63,18 +63,28 @@
             </div>
         </div>
         <br>
-        {% if user.articles|length > 0 %}
-            <legend class='text-center text-info display-10'>Статьи пользователя</legend>
-            <div class="container">
-                    {% for el in user.articles %}
-                        <div class="alert alert-info">
-                            <h2>{{ el.title }}</h2>
-                            <p>{{ el.intro }}</p>
-                            <p><b>Дата: {{ el.date.date().strftime("%d.%m.%y") }}, {{ el.date.time().strftime("%H:%M") }}</b></p>
-                            <a href="/posts/{{ el.id }}" class="btn btn-warning">Детальнее</a>
-                        </div>
-                    {% endfor %}
+        <ul class='list-group-item'>
+            <legend class='text-center text-info display-10'>Немного о пользователе</legend>
+            <li class="list-group-item">
+                {% if user.info.about != None and user.info.about|length > 0  %}
+                <p class="text fs-5">{{ user.info.about }}</p>
+                {% else %}
+                <p class="text fs-5"><i>Пользователь ничего не рассказал о себе =(</i></p>
+                {% endif %}
+            </li>
+        </ul>
+        {% if user.articles %}
+        <div class="container p-4" style="background: white">
+        <legend class='text-center text-info display-10'>Статьи пользователя</legend>
+            {% for el in user.articles %}
+            <div class="alert alert-info">
+                <h2>{{ el.title }}</h2>
+                <p>{{ el.intro }}</p>
+                <p><b>Дата: {{ el.date.date().strftime("%d.%m.%y") }}, {{ el.date.time().strftime("%H:%M") }}</b></p>
+                <a class="btn btn-warning" href="/posts/{{ el.id }}">Детальнее</a>
             </div>
+            {% endfor %}
+        </div>
         {% endif %}
     </div>
 </div>

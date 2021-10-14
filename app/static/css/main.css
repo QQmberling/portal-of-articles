@@ -1,35 +1,37 @@
 img.avatar {
-	max-width: 400px;
+    max-width: 400px;
     max-height: 400px;
-	height: auto;
-	padding: 0 10px 10px 0;
+    height: auto;
+    padding: 0 10px 10px 0;
 }
 
 img.avatar.thumb {
-	max-width: 250px;
+    max-width: 250px;
     max-height: 250px;
-	height: auto;
+    height: auto;
+}
+
+
+p.text {
+    font-family: Roboto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    text-align: justify;
 }
 
 .signature {
-    margin-left: auto;
-    margin-right: 0em;
-    max-width: 20em;
     text-align: right;
-    /*background-color: aqua;*/
 }
-.intro {
-    margin-right: auto;
-    margin-left: 0em;
-    max-width: 20em;
-    text-align: justify;
 
+.intro {
+    text-align: justify;
     -moz-hyphens: auto;
     -webkit-hyphens: auto;
     -ms-hyphens: auto;
     word-break: break-word;
 }
-.about-text{
+
+.about {
     margin-right: auto;
     margin-left: 0em;
     max-width: 50em;
@@ -41,41 +43,40 @@ img.avatar.thumb {
     inline-size: auto;
 }
 
-pre{
-    font-family: Roboto;
-    white-space: pre-wrap;
-    word-break: break-word;
-    /*font-family: Georgia;*/
-}
 body {
     /*background-color: #d2f4d2;*/
+    font-family: Roboto;
     background-image: linear-gradient(rgba(255, 0, 0, 0), rgba(255, 0, 0, 0)), url(../img/shrek_back_3.jpg);
     background-position: top;
     background-repeat: repeat, no-repeat;
     background-size: auto, cover;
     opacity: 85%;
 }
-.right-buttons{
+
+.right-buttons {
     margin-left: auto;
     margin-right: 0em;
-    max-width: 20em;
     text-align: right;
 }
-.left-buttons{
+
+.left-buttons {
     margin-right: auto;
     margin-left: 0em;
-    max-width: 20em;
+    margin-top: 20px;
     text-align: left;
 }
+
 .center {
     top: 50%;
     left: 0;
     right: 0;
     margin: auto;
 }
-.inl{
+
+.inl {
     display: inline-block;
 }
+
 .closebtn {
     margin-left: 15px;
     color: gray;
@@ -86,26 +87,30 @@ body {
     cursor: pointer;
     transition: 0.3s;
 }
+
 .closebtn:hover {
     color: black;
 }
-/*a { text-decoration: none; }*/
-a { text-decoration: none; color: navy; }
-a:hover { text-decoration: underline; }
 
-.text-article{
+/*a { text-decoration: none; }*/
+a {
+    text-decoration: none;
+    color: navy;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.text-article {
     height: 500px;
 }
-.text-intro{
-    height: 100px;
+
+.test {
+    border: 2px solid red;
 }
 
-.test
-  {
-    border: 2px solid red;
-  }
-.test2
-{
+.test2 {
     border: 1px solid blue;
 }
 
@@ -118,6 +123,7 @@ a:hover { text-decoration: underline; }
     display: inline-block;
     position: relative;
 }
+
 .bubble::after {
     background-color: aliceblue;
     content: '';
@@ -130,6 +136,7 @@ a:hover { text-decoration: underline; }
     left: 40px;
     transform: skewX(-30deg) skewY(-48deg);
 }
+
 .bubble-in {
     background-color: aliceblue;
     border-radius: 12px;

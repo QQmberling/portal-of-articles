@@ -3,51 +3,51 @@
 {% block content %}
 <div class="container">
     <form action="" method="POST">
-    {{form.hidden_tag()}}
-    <fieldset class="form-group">
-        <div class="container">
-            {% with messages = get_flashed_messages(with_categories=true) %}
+        {{form.hidden_tag()}}
+        <fieldset class="form-group">
+            <div class="container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
-                    <ul class='flashes'>
-                            {% for category, message in messages %}
-                            <div class='alert alert-{{category}} px-5'>
-                                <li>{{ message }}</li>
-                            </div>
-                            {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endwith %}
-        {% for field in form if field.name not in ['csrf_token', 'submit'] -%}
-            {% if field.errors %}
-                {% for error in field.errors %}
-                    <div class='alert alert-danger px-5 m-2'>
-                        {{ error }}
-                        <span class="closebtn" onclick="this.parentElement.style.display='none';">×</span>
+                <ul class='flashes'>
+                    {% for category, message in messages %}
+                    <div class='alert alert-{{category}} px-5'>
+                        <li>{{ message }}</li>
                     </div>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% endwith %}
+                {% for field in form if field.name not in ['csrf_token', 'submit'] -%}
+                {% if field.errors %}
+                {% for error in field.errors %}
+                <div class='alert alert-danger px-5 m-2'>
+                    {{ error }}
+                    <span class="closebtn" onclick="this.parentElement.style.display='none';">×</span>
+                </div>
                 {% endfor %}
-            {% endif %}
-        {% endfor %}
+                {% endif %}
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ form.title.label(class='form-control-lg text-primary') }}
+                {{ form.title(class='form-control form-control-lg')}}
+            </div>
+            <div class="form-group">
+                {{ form.intro.label(class='form-control-lg text-primary') }}
+                {{ form.intro(class='form-control text-intro')}}
+            </div>
+            <div class="form-group">
+                {{ form.text.label(class='form-control-lg text-primary') }}
+                {{ form.text(class='form-control text-article') }}
+            </div>
+        </fieldset>
+        <div class="field-group mt-4">
+            <p>
+                {{ form.able_to_comment.label(class='form-control-lg text-primary') }} {{ form.able_to_comment() }}
+            </p>
+            {{form.submit(class='btn btn-primary')}}
         </div>
-        <div class="form-group" >
-            {{ form.title.label(class='form-control-lg text-primary') }}
-            {{ form.title(class='form-control form-control-lg')}}
-        </div>
-        <div class="form-group">
-            {{ form.intro.label(class='form-control-lg text-primary') }}
-            {{ form.intro(class='form-control text-intro')}}
-        </div>
-        <div class="form-group">
-            {{ form.text.label(class='form-control-lg text-primary') }}
-            {{ form.text(class='form-control text-article') }}
-        </div>
-    </fieldset>
-    <div class="field-group mt-4">
-        <p>
-            {{ form.able_to_comment.label(class='form-control-lg text-primary') }} {{ form.able_to_comment() }}
-        </p>
-      {{form.submit(class='btn btn-primary')}}
-    </div>
-  </form>
+    </form>
 </div>
 {{super()}}
 {% endblock %}

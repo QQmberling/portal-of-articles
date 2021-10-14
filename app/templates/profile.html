@@ -8,7 +8,7 @@
                 <div class="d-flex justify-content-center">
                     <img class="avatar m-2" src="{{ current_user.url_avatar() }}">
                 </div>
-                <a href={{url_for('.profile_edit')}}><p class="text-center">Редактировать профиль</p></a>
+                <a href={{url_for('.profile_edit')}}><p class="text-center fs-5">Редактировать профиль</p></a>
             </div>
 
             <div class="col p-2" style="min-width: 350px">
@@ -20,7 +20,7 @@
                                 Логин:
                             </div>
                             <div class="col">
-                               {{ current_user.username }}
+                                {{ current_user.username }}
                             </div>
                         </div>
                     </li>
@@ -30,7 +30,8 @@
                                 Имя:
                             </div>
                             <div class="col">
-                                {% if current_user.info.first_name %}{{ current_user.info.first_name }}{% else %}<i>Не указано</i>{% endif %}
+                                {% if current_user.info.first_name %}{{ current_user.info.first_name }}{% else %}<i>Не
+                                указано</i>{% endif %}
                             </div>
                         </div>
                     </li>
@@ -40,7 +41,8 @@
                                 Фамилия:
                             </div>
                             <div class="col">
-                                {% if current_user.info.last_name %}{{ current_user.info.last_name }}{% else %}<i>Не указано</i>{% endif %}
+                                {% if current_user.info.last_name %}{{ current_user.info.last_name }}{% else %}<i>Не
+                                указано</i>{% endif %}
                             </div>
                         </div>
                     </li>
@@ -50,30 +52,47 @@
                                 Пол:
                             </div>
                             <div class="col">
-                                {% if current_user.info.gender %}<b>{{ current_user.info.gender }}</b>{% else %}<i>Не указано</i>{% endif %}
+                                {% if current_user.info.gender %}<b>{{ current_user.info.gender }}</b>{% else %}<i>Не
+                                указано</i>{% endif %}
                             </div>
                         </div>
                     </li>
-                    <li class="list-group-item">Дата регистрации: {{ current_user.date.date().strftime("%d.%m.%y") }}, {{ current_user.date.time().strftime("%H:%M") }}</li>
+                    <li class="list-group-item">Дата регистрации: {{ current_user.date.date().strftime("%d.%m.%y") }},
+                        {{ current_user.date.time().strftime("%H:%M") }}
+                    </li>
                     <li class="list-group-item">Написано статей: {{ current_user.count_articles() }}</li>
                     <li class="list-group-item">Написано комментариев: {{ current_user.count_comments() }}</li>
-                    <li class="list-group-item">Последняя активность: {{ current_user.last_seen.date().strftime("%d.%m.%y") }}, {{ current_user.last_seen.time().strftime("%H:%M") }}</li>
+                    <li class="list-group-item">Последняя активность: {{
+                        current_user.last_seen.date().strftime("%d.%m.%y") }}, {{
+                        current_user.last_seen.time().strftime("%H:%M") }}
+                    </li>
                 </ul>
             </div>
         </div>
         <br>
-        {% if context.articles|length > 0 %}
-            <legend class='text-center text-info display-10'>Статьи пользователя</legend>
-            <div class="container">
-                    {% for el in context.articles %}
-                        <div class="alert alert-info">
-                            <h2>{{ el.title }}</h2>
-                            <p>{{ el.intro }}</p>
-                            <p><b>Дата: {{ el.date.date().strftime("%d.%m.%y") }}, {{ el.date.time().strftime("%H:%M") }}</b></p>
-                            <a href="/posts/{{ el.id }}" class="btn btn-warning">Детальнее</a>
-                        </div>
-                    {% endfor %}
+        <ul class='list-group-item'>
+            <legend class='text-center text-info display-10'>Немного о себе</legend>
+            <li class="list-group-item">
+                {% if current_user.info.about != None and current_user.info.about|length > 0  %}
+                <p class="text fs-5">{{ current_user.info.about }}</p>
+                {% else %}
+                <p class="text fs-5"><i>Пользователь ничего не рассказал о себе =(</i></p>
+                {% endif %}
+            </li>
+        </ul>
+        {% if current_user.articles %}
+        <div class="container p-4" style="background: white">
+        <legend class='text-center text-info display-10'>Мои статьи</legend>
+
+            {% for el in current_user.articles %}
+            <div class="alert alert-info">
+                <h2>{{ el.title }}</h2>
+                <p>{{ el.intro }}</p>
+                <p><b>Дата: {{ el.date.date().strftime("%d.%m.%y") }}, {{ el.date.time().strftime("%H:%M") }}</b></p>
+                <a class="btn btn-warning" href="/posts/{{ el.id }}">Детальнее</a>
             </div>
+            {% endfor %}
+        </div>
         {% endif %}
     </div>
 </div>

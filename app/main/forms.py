@@ -69,5 +69,5 @@ class ArticleEditForm(FlaskForm):
 
 
 class CreateCommentForm(FlaskForm):
-    text = TextAreaField('Комментарий', validators=[DataRequired()])
+    text = TextAreaField('', validators=[DataRequired()])
     submit = SubmitField("Отправить")

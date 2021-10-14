@@ -1,92 +1,100 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container-fluid" >
+<div class="container-fluid">
     <div class="container" style="width: 50%">
         {% for field in form if field.name not in ['csrf_token', 'submit'] -%}
-            {% if field.errors %}
-                {% for error in field.errors %}
-                    <div class='alert alert-danger px-5 m-2'>
-                        {{ error }}
-                        <span class="closebtn" onclick="this.parentElement.style.display='none';">×</span>
-                    </div>
-                {% endfor %}
-            {% endif %}
+        {% if field.errors %}
+        {% for error in field.errors %}
+        <div class='alert alert-danger px-5 m-2'>
+            {{ error }}
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">×</span>
+        </div>
+        {% endfor %}
+        {% endif %}
         {% endfor %}
 
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class='alert alert-{{category}} px-5 m-2'>
-                        {{ message }}
-                        <span class="closebtn" onclick="this.parentElement.style.display='none';">×</span>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        <form action="" method="POST" enctype="multipart/form-data">
-        <div class="row">
-            <div class="col">
-                {{ form.hidden_tag() }}
-                <div class="d-flex justify-content-center">
-                    <img class="avatar m-2" src="{{ current_user.url_avatar() }}">
-                </div>
-                <p class="text-center px-3">{{form.avatar(class='form-control-file')}}</p>
-            </div>
-            <div class="col p-2" style="min-width: 350px">
-                <ul class='list-group-item'>
-                    <legend class='text-center text-info display-10'>Информация о пользователе</legend>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-3">
-                                Логин:
-                            </div>
-                            <div class="col">
-                               {{ current_user.username }}
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-3">
-                                Имя:
-                            </div>
-                            <div class="col">
-                                {{ form.first_name }}
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-3">
-                                Фамилия:
-                            </div>
-                            <div class="col">
-                                {{ form.last_name }}
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-3">
-                                {{ form.gender.label }}
-                            </div>
-                            <div class="col">
-                                {{ form.gender }}
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">Дата регистрации: {{ current_user.date.date().strftime("%d.%m.%y") }}, {{ current_user.date.time().strftime("%H:%M") }}</li>
-                    <li class="list-group-item">Написано статей: {{ current_user.count_articles() }}</li>
-                    <li class="list-group-item">Написано комментариев: {{ current_user.count_comments() }}</li>
-                    <li class="list-group-item">Последняя активность: {{ current_user.last_seen.date().strftime("%d.%m.%y") }}, {{ current_user.last_seen.time().strftime("%H:%M") }}</li>
-                </ul>
-            </div>
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class='alert alert-{{category}} px-5 m-2'>
+            {{ message }}
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">×</span>
         </div>
-        <legend class='text-center text-info display-10'>{{ form.about.label(class='form-control-label') }}</legend>
-        {{ form.about(class='form-control form-control-lg', rows = '5') }}
-        <br>
-        <p class="text-center"><a class="btn bg-primary text-danger btn-outline-danger" type="href" href="{{url_for('.profile')}}">Отмена</a> {{ form.submit(class="btn bg-primary btn-outline-info text-info") }}</p>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <form action="" enctype="multipart/form-data" method="POST">
+            <div class="row">
+                <div class="col">
+                    {{ form.hidden_tag() }}
+                    <div class="d-flex justify-content-center">
+                        <img class="avatar m-2" src="{{ current_user.url_avatar() }}">
+                    </div>
+                    <p class="text-center px-3">{{form.avatar(class='form-control-file')}}</p>
+                </div>
+                <div class="col p-2" style="min-width: 350px">
+                    <ul class='list-group-item'>
+                        <legend class='text-center text-info display-10'>Информация о пользователе</legend>
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-3">
+                                    Логин:
+                                </div>
+                                <div class="col">
+                                    {{ current_user.username }}
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-3">
+                                    Имя:
+                                </div>
+                                <div class="col">
+                                    {{ form.first_name }}
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-3">
+                                    Фамилия:
+                                </div>
+                                <div class="col">
+                                    {{ form.last_name }}
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-3">
+                                    {{ form.gender.label }}
+                                </div>
+                                <div class="col">
+                                    {{ form.gender }}
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">Дата регистрации: {{ current_user.date.date().strftime("%d.%m.%y")
+                            }}, {{ current_user.date.time().strftime("%H:%M") }}
+                        </li>
+                        <li class="list-group-item">Написано статей: {{ current_user.count_articles() }}</li>
+                        <li class="list-group-item">Написано комментариев: {{ current_user.count_comments() }}</li>
+                        <li class="list-group-item">Последняя активность: {{
+                            current_user.last_seen.date().strftime("%d.%m.%y") }}, {{
+                            current_user.last_seen.time().strftime("%H:%M") }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <legend class='text-center text-info display-10'>{{ form.about.label(class='form-control-label') }}</legend>
+            {{ form.about(class='form-control form-control-lg', rows = '5') }}
+            <br>
+            <p class="text-center"><a class="btn bg-primary text-danger btn-outline-danger"
+                                      href="{{url_for('.profile')}}"
+                                      type="href">Отмена</a> {{ form.submit(class="btn bg-primary
+                btn-outline-info text-info") }}</p>
         </form>
     </div>
 </div>

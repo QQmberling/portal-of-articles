@@ -33,8 +33,7 @@ def after_request(response):
 @main.route('/profile')
 @login_required
 def profile():
-    articles = db.session.query(Article).filter(Article.author_id == current_user.id).all()
-    context = {'legend': f'Профиль {current_user.username}', 'articles': articles}
+    context = {'legend': f'Профиль {current_user.username}'}
     return render_template('profile.html', context=context)
 
 
