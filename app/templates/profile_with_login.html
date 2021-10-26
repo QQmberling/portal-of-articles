@@ -51,7 +51,8 @@
                                 Пол:
                             </div>
                             <div class="col">
-                                {% if user.info.gender %}<b>М</b>{% else %}<b>Ж</b>{% endif %}
+                                {% if user.info.gender %}<b>{{ user.info.gender }}</b>{% else %}<i>Не
+                                указано</i>{% endif %}
                             </div>
                         </div>
                     </li>

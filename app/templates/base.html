@@ -3,6 +3,7 @@
 {% block head %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="{{ url_for('static', filename='css/main.css')}}" rel="stylesheet">
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
 {% endblock %}
 
 {% block title %}Shrekoblog{% endblock %}
@@ -10,7 +11,7 @@
 {% block navbar %}
 <nav class="navbar navbar-expand-lg" style="background-color: #77dd77;">
     <div class="container-fluid">
-        <a href="{{url_for('.index')}}"><img class="navbar-brand-logo px-4"
+        <a href="{{url_for('main.index')}}"><img class="navbar-brand-logo px-4"
                                              src="{{url_for('static', filename='img/logo2.jpg')}}"></a>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <div class="d-flex px-2">
@@ -52,7 +53,7 @@
     <footer class="row row-cols-5 py-5 my-5 border-top">
         <div class="col">
             <a class="d-flex align-items-center mb-3 link-dark text-decoration-none" href="/">
-                <a href="{{url_for('.index')}}"><img class="navbar-brand-logo px-4"
+                <a href="{{url_for('main.index')}}"><img class="navbar-brand-logo px-4"
                                                      src="{{url_for('static', filename='img/logo1.png')}}"></a>
             </a>
             <p class="text-dark">©QQmberling Swamp 2021</p>

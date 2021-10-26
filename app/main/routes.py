@@ -1,13 +1,13 @@
 import sqlite3
 from datetime import datetime
 
-from flask import render_template, request, redirect, flash, url_for, session
+from flask import render_template, request, redirect, flash, url_for, session, abort
 from flask_login import login_user, logout_user, login_required, current_user
-from sqlalchemy import func
 from werkzeug.datastructures import MultiDict
+from sqlalchemy import inspect
 
 from app import TIMEZONE, MIN_SIZE
-from app.classes import User, Article, UserInfo, Comment
+from app.models import User, Article, UserInfo, Comment
 from . import main
 from .forms import LoginForm, RegistrationForm, ArticleCreateForm, ArticleEditForm, UserEditForm, ImageForm, \
     CreateCommentForm
@@ -276,11 +276,7 @@ def login_form():
 
 @main.route('/authors')
 def authors_page():
-    # full_query = db.session.query(User.username, func.count(Article.id)).group_by(Article.author_id).join(User, Article.author_id == User.id).order_by(func.count(Article.id).desc()).all()
-
-    subquery = db.session.query(Article.author_id, func.count(Article.id).label('count')).group_by(Article.author_id).subquery()
-    authors = User.query.join(subquery, subquery.c.author_id == User.id).order_by(subquery.c.count.desc()).all()
-
+    authors = User.get_authors()
     context = {'legend': 'Авторы', 'authors': authors}
     return render_template('authors.html', context=context)
 

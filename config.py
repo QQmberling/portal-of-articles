@@ -10,7 +10,10 @@ class Config:
     """Base config."""
     SECRET_KEY = environ.get('SECRET_KEY') or 'YOU SHALL NOT GUESS'
     ADMIN_PSW = environ.get('ADMIN_PSW') or 'admin'
+    MAX_CONTENT_LENGTH = 16 * 1000 * 1000
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    JSON_AS_ASCII = False
+    JSON_SORT_KEYS = False
 
     @staticmethod
     def init_app(app):
