@@ -40,7 +40,7 @@ def create_app(config_name):
     app.register_blueprint(main_blueprint, url_prefix='/')
 
     from .api import api as api_blueprint
-    api_blueprint.register(api_)
+    api_.init_app(api_blueprint)
     app.register_blueprint(api_blueprint, url_prefix='/api/v1')
 
     return app
