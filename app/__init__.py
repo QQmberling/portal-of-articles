@@ -5,6 +5,8 @@ from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_restx import Api
+
 from config import config
 
 TIMEZONE = datetime.timezone(datetime.timedelta(hours=3))  # Таймзона Москвы
@@ -15,6 +17,7 @@ MIN_SIZE = (200, 200)
 APP_ROOT = path.abspath(path.dirname(__file__))
 db = SQLAlchemy()
 bootstrap = Bootstrap()
+api_ = Api()
 
 login_manager = LoginManager()
 login_manager.login_view = 'main.login_form'
@@ -37,6 +40,7 @@ def create_app(config_name):
     app.register_blueprint(main_blueprint, url_prefix='/')
 
     from .api import api as api_blueprint
+    api_blueprint.register(api_)
     app.register_blueprint(api_blueprint, url_prefix='/api/v1')
 
     return app

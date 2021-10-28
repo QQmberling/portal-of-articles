@@ -18,23 +18,6 @@ def test():
 
 
 @app.cli.command()
-def urls2():
-    '''return a json list of api endpoints'''
-    urls = {}
-    for rule in current_app.url_map.iter_rules():
-        if rule.endpoint is not 'static' and rule.endpoint.startswith('api.'):
-            options = {}
-            for arg in rule.arguments:
-                options[arg] = "[{0}]".format(arg)
-
-            urls[rule.endpoint] = {
-                'methods': ','.join(rule.methods),
-                'url': url_for(rule.endpoint, **options)
-            }
-    return jsonify(urls)
-
-
-@app.cli.command()
 def urls(rule_filter=None):
     rule_filter = rule_filter or (lambda rule: True)
     app_rules = [
