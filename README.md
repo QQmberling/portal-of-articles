@@ -28,10 +28,9 @@ Allows you to:
 
 ## API
 
+Allows you to do exactly the same things.
+
 ![Screenshot_6](https://user-images.githubusercontent.com/67502319/140826772-e25da38b-37e2-4eae-af71-4bad44a29722.jpg)
 
 ![Screenshot_7](https://user-images.githubusercontent.com/67502319/140826782-6104c639-e649-4da3-89f9-b6ba964a1f00.jpg)
-
-Allows you to do exactly the same things.
-
 
