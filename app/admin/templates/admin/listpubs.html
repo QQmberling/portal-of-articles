@@ -4,14 +4,14 @@
 {{ super() }}
 <h1>{{title}}</h1>
 <ul class="list-posts">
-{% for p in list %}
-<li>
-<p class="title"><a>Заголовок: {{p.title}}</a></p>
-<p class="announce">Интро: {{ p.intro | striptags  }}</p>
-<p class="text-danger">Текст: {{p.text}}</p>
-<p class="fa-times">Дата публикации: {{p.date}}</p>
-</li>
-{% endfor %}
+    {% for p in list %}
+    <li>
+        <p class="title"><a>Заголовок: {{p.title}}</a></p>
+        <p class="announce">Интро: {{ p.intro | striptags }}</p>
+        <p class="text-danger">Текст: {{p.text}}</p>
+        <p class="fa-times">Дата публикации: {{p.date}}</p>
+    </li>
+    {% endfor %}
 </ul>
 {% endblock %}
 <!--"{{ url_for('showPost', alias=p.url)}}"-->

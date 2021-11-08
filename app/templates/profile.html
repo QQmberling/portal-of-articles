@@ -6,7 +6,7 @@
         <div class="row">
             <div class="col">
                 <div class="d-flex justify-content-center">
-                    <img class="avatar m-2" src="{{ current_user.url_avatar() }}">
+                    <img class="avatar m-2" src="{{ current_user.url_avatar }}">
                 </div>
                 <a href={{url_for('.profile_edit')}}><p class="text-center fs-5">Редактировать профиль</p></a>
             </div>
@@ -57,14 +57,15 @@
                             </div>
                         </div>
                     </li>
-                    <li class="list-group-item">Дата регистрации: {{ current_user.date.date().strftime("%d.%m.%y") }},
-                        {{ current_user.date.time().strftime("%H:%M") }}
+                    <li class="list-group-item">Дата регистрации: {{ current_user.info.date.date().strftime("%d.%m.%y")
+                        }},
+                        {{ current_user.info.date.time().strftime("%H:%M") }}
                     </li>
-                    <li class="list-group-item">Написано статей: {{ current_user.count_articles() }}</li>
-                    <li class="list-group-item">Написано комментариев: {{ current_user.count_comments() }}</li>
+                    <li class="list-group-item">Написано статей: {{ current_user.count_articles }}</li>
+                    <li class="list-group-item">Написано комментариев: {{ current_user.count_comments }}</li>
                     <li class="list-group-item">Последняя активность: {{
-                        current_user.last_seen.date().strftime("%d.%m.%y") }}, {{
-                        current_user.last_seen.time().strftime("%H:%M") }}
+                        current_user.info.last_seen.date().strftime("%d.%m.%y") }}, {{
+                        current_user.info.last_seen.time().strftime("%H:%M") }}
                     </li>
                 </ul>
             </div>
@@ -73,7 +74,7 @@
         <ul class='list-group-item'>
             <legend class='text-center text-info display-10'>Немного о себе</legend>
             <li class="list-group-item">
-                {% if current_user.info.about != None and current_user.info.about|length > 0  %}
+                {% if current_user.info.about != None and current_user.info.about|length > 0 %}
                 <p class="text fs-5">{{ current_user.info.about }}</p>
                 {% else %}
                 <p class="text fs-5"><i>Пользователь ничего не рассказал о себе =(</i></p>
@@ -82,14 +83,14 @@
         </ul>
         {% if current_user.articles %}
         <div class="container p-4" style="background: white">
-        <legend class='text-center text-info display-10'>Мои статьи</legend>
+            <legend class='text-center text-info display-10'>Мои статьи</legend>
 
             {% for el in current_user.articles %}
             <div class="alert alert-info">
                 <h2>{{ el.title }}</h2>
                 <p>{{ el.intro }}</p>
                 <p><b>Дата: {{ el.date.date().strftime("%d.%m.%y") }}, {{ el.date.time().strftime("%H:%M") }}</b></p>
-                <a class="btn btn-warning" href="/posts/{{ el.id }}">Детальнее</a>
+                <a class="btn btn-warning" href="/articles/{{ el.id }}">Детальнее</a>
             </div>
             {% endfor %}
         </div>

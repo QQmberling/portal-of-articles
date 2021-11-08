@@ -1,17 +1,12 @@
-import sqlite3
-from datetime import datetime
-
 from flask import render_template, request, redirect, flash, url_for, session, abort
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.datastructures import MultiDict
-from sqlalchemy import inspect
 
-from app import TIMEZONE, MIN_SIZE
-from app.models import User, Article, UserInfo, Comment
+from app.models import User, Article, Comment
 from . import main
-from .forms import LoginForm, RegistrationForm, ArticleCreateForm, ArticleEditForm, UserEditForm, ImageForm, \
-    CreateCommentForm
+from .forms import LoginForm, RegistrationForm, ArticleCreateForm, ArticleEditForm, UserEditForm, CreateCommentForm
 from .. import db, login_manager
+from ..exceptions import ValidationError
 
 
 @login_manager.user_loader
@@ -21,8 +16,8 @@ def load_user(user_id):
 
 @main.before_request
 def update_last_active():
-    current_user.last_seen = datetime.now(TIMEZONE)
-    db.session.commit()
+    if not current_user.is_anonymous:
+        current_user.ping()
 
 
 @main.after_request
@@ -47,45 +42,24 @@ def profile_edit():
                                        'about': current_user.info.about,
                                        'gender': current_user.info.gender
                                        }))
-        form2 = ImageForm()
     else:
         form = UserEditForm()
-        form2 = ImageForm()
-
     if form.validate_on_submit():
-        first_name = form.first_name.data
-        last_name = form.last_name.data
-        about = form.about.data
-        gender = form.gender.data
-
-        current_user.info.about = about
-        current_user.info.first_name = first_name
-        current_user.info.last_name = last_name
-        current_user.info.gender = gender
-
-        form2.avatar.data = form.avatar.data
-        if form2.validate_on_submit():
-            picture_name = current_user.save_avatar(form.avatar.data)
-            if picture_name:
-                current_user.picture_name = picture_name
-            else:
-                flash(f'Изображение слишком маленькое. Минимальное разрешение: {MIN_SIZE}', 'danger')
-                return render_template('profile_edit.html', context=context, form=form, form2=form2)
-        else:
-            if form2.avatar.data.stream.name is not None:
-                flash('Аватар не соответствует требованиям.', 'danger')
-                return render_template('profile_edit.html', context=context, form=form, form2=form2)
-
-            if current_user.picture_name == 'default_male.png' or current_user.picture_name == 'default_female.png':
-                if current_user.info.gender == 'М':
-                    current_user.picture_name = 'default_male.png'
-                else:
-                    current_user.picture_name = 'default_female.png'
-
-        db.session.commit()
+        payload = {'first_name': form.first_name.data,
+                   'last_name': form.last_name.data,
+                   'about': form.about.data,
+                   'gender': form.gender.data, }
+        # if form.avatar.data.stream.name is not None:
+        #     payload['avatar'] = form.avatar.data
+        if form.avatar.data is not None and form.avatar.data.filename != '':
+            payload['avatar'] = form.avatar.data
+        try:
+            current_user.upd(payload)
+        except ValidationError as e:
+            flash(f'{e}', 'danger')
+            return render_template('profile_edit.html', context=context, form=form)
         return redirect(url_for('.profile'))
-
-    return render_template('profile_edit.html', context=context, form=form, form2=form2)
+    return render_template('profile_edit.html', context=context, form=form)
 
 
 @main.route('/profile/<string:username>')
@@ -109,25 +83,16 @@ def register():
     context = {'legend': 'Регистрация'}
     if current_user.is_authenticated:
         return redirect(url_for('.profile'))
-
     form = RegistrationForm()
-
     if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-        email = form.email.data
-        new_user = User(username=username, password=password, email=email, date=datetime.now(TIMEZONE))
-        try:
-            db.session.add(new_user)
-            db.session.commit()
-            id = db.session.query(User.id).filter_by(username=username).first()[0]
-            user_info = UserInfo(id=id)
-            db.session.add(user_info)
-            db.session.commit()
-            flash(f'Регистрация аккаунт на email {email} успешно завершена. Можете авторизоваться.', 'success')
-        except sqlite3.Error as e:
-            return f'При регистрации возникла ошибка {e}'
-        return redirect(url_for('.login_form'))
+        payload = {'email': form.email.data,
+                   'username': form.username.data,
+                   'password': form.password.data,
+                   }
+        User.create(payload)
+        flash(f'Регистрация аккаунта на email {payload["email"]} успешно завершена. Можете авторизоваться.',
+              'success')
+        return redirect(url_for('.login'))
     return render_template('register.html', context=context, form=form)
 
 
@@ -138,128 +103,100 @@ def index():
     return render_template('index.html', context=context)
 
 
-@main.route('/posts')
-def posts():
+@main.route('/articles')
+def articles():
     articles = db.session.query(Article).all()
     context = {'legend': 'Статьи', 'articles': articles}
-    return render_template('posts.html', context=context)
+    return render_template('articles.html', context=context)
 
 
-@main.route('/posts/<int:id>', methods=['POST', 'GET'])
-def post_detail(id):
+@main.route('/articles/<int:id>', methods=['POST', 'GET'])
+def article_detail(id):
     form = None
     article = db.session.query(Article).filter(Article.id == id).first_or_404()
     if request.method == 'POST':
         if current_user.is_authenticated:
             form = CreateCommentForm()
             if form.validate_on_submit():
-                comment = Comment(text=form.text.data, author_id=current_user.id, article_id=id, date=datetime.now(TIMEZONE))
-                db.session.add(comment)
-                db.session.commit()
-                return redirect(url_for('.post_detail', id=id))
+                payload = {'text': form.text.data, 'author_id': current_user.id, 'article_id': id}
+                Comment.create(payload)
+                return redirect(url_for('.article_detail', id=id))
         else:
             flash('Необходимо авторизоваться.', 'danger')
-            session['next'] = url_for('.post_detail', id=id)
-            return redirect(url_for('.login_form'))
+            session['next'] = url_for('.article_detail', id=id)
+            return redirect(url_for('.login'))
     context = {'legend': '', 'article': article}
-    return render_template('post_detail.html', context=context, form=form)
+    return render_template('article_detail.html', context=context, form=form)
 
 
-@main.route('/posts/<int:id>/del')
+@main.route('/articles/<int:id>/delete')
 @login_required
-def post_delete(id):
+def article_delete(id):
     article = Article.query.get_or_404(id)
     if current_user.id == article.author_id:
-        try:
-            db.session.query(Comment).filter(Comment.article_id == article.id).delete()
-            db.session.delete(article)
-            db.session.commit()
-            return redirect('/posts')
-        except:
-            return 'При удалении статьи произошла ошибка'
+        article.delete()
+        return redirect(url_for('.articles'))
     else:
-        return 'Статью может удалять только автор'
+        return abort(403, 'Статью может удалять только автор')
 
 
-@main.route('/comment/<int:id>/del')
+@main.route('/comment/<int:id>/delete')
 @login_required
 def comment_delete(id):
     comment = Comment.query.get_or_404(id)
     if current_user.id == comment.author_id:
-        try:
-            db.session.delete(comment)
-            db.session.commit()
-            return redirect(url_for('.post_detail', id=comment.article_id))
-        except:
-            return 'При удалении комментария произошла ошибка'
+        comment.delete()
+        return redirect(url_for('.article_detail', id=comment.article_id))
     else:
-        return 'Комментарий может удалять только автор'
+        return abort(403, 'Комметарий может удалять только автор')
 
 
 @main.route('/create-article', methods=['POST', 'GET'])
 @login_required
-def create_article():
+def article_create():
     form = ArticleCreateForm()
     if form.validate_on_submit():
-        title = form.title.data
-        intro = form.intro.data
-        text = form.text.data
-        able_to_comment = form.able_to_comment.data
-
-        new_article = Article(title=title,
-                              intro=intro,
-                              text=text,
-                              able_to_comment=able_to_comment,
-                              author_id=current_user.id,
-                              date=datetime.now(TIMEZONE))
-
-        try:
-            db.session.add(new_article)
-            db.session.commit()
-            return redirect('/posts')
-        except:
-            return 'При добавлении статьи возникла ошибка'
+        payload = {'title': form.title.data,
+                   'intro': form.intro.data,
+                   'text': form.text.data,
+                   'able_to_comment': form.able_to_comment.data,
+                   'author_id': current_user.id}
+        new_article = Article.create(payload)
+        return redirect(url_for('.article_detail', id=new_article.id))
     context = {'legend': 'Создание статьи'}
     return render_template('create-article.html', context=context, form=form)
 
 
-@main.route('/posts/<int:id>/update', methods=['POST', 'GET'])
+@main.route('/articles/<int:id>/update', methods=['POST', 'GET'])
 @login_required
-def post_update(id):
+def article_update(id):
     context = {'legend': 'Редактирование статьи'}
-
     article = Article.query.get_or_404(id)
     if current_user.id == article.author_id:
         if request.method == 'GET':
-            form = ArticleEditForm(MultiDict({'title': article.title, 'intro': article.intro, 'text': article.text, 'able_to_comment': article.able_to_comment}))
+            form = ArticleEditForm(MultiDict({'title': article.title, 'intro': article.intro, 'text': article.text,
+                                              'able_to_comment': article.able_to_comment}))
         else:
             form = ArticleEditForm()
-
         if form.validate_on_submit():
-            article.title = form.title.data
-            article.intro = form.intro.data
-            article.text = form.text.data
-            article.able_to_comment = form.able_to_comment.data
-            article.edit_date = datetime.now(TIMEZONE)
-            try:
-                db.session.commit()
-                return redirect('/posts')
-            except:
-                return 'При редактировании статьи возникла ошибка'
+            payload = {'title': form.title.data,
+                       'intro': form.intro.data,
+                       'text': form.text.data,
+                       'able_to_comment': form.able_to_comment.data}
+            article.upd(payload)
+            return redirect(url_for('.article_detail', id=article.id))
         else:
-            return render_template('post_update.html', context=context, form=form)
+            return render_template('article_update.html', context=context, form=form)
     else:
-        return 'Обновлять статью может только её автор'
+        return abort(403, 'Статью может редактировать только автор')
 
 
-@main.route("/login_form", methods=["POST", "GET"])
-def login_form():
+@main.route("/login", methods=["POST", "GET"])
+def login():
     context = {'legend': 'Авторизация'}
     if current_user.is_authenticated:
         return redirect(url_for('.index'))
-
     form = LoginForm()
-
     if form.validate_on_submit():
         username = form.username.data
         password = form.password.data
@@ -271,7 +208,7 @@ def login_form():
             return redirect(request.args.get("next") or next or url_for(".index"))
         else:
             flash('Неверный логин или пароль', category='danger')
-    return render_template('login_form.html', context=context, form=form)
+    return render_template('login.html', context=context, form=form)
 
 
 @main.route('/authors')
@@ -283,7 +220,5 @@ def authors_page():
 
 @main.route('/prank/<int:id>')
 def prank(id):
-    flash('Редачить комменты пока нельзя =(((((', 'danger')
-    return redirect(url_for('.post_detail', id=id))
-
-
+    flash('Редактировать комментарии нельзя.', 'danger')
+    return redirect(url_for('.article_detail', id=id))

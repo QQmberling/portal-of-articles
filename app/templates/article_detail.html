@@ -15,14 +15,14 @@
     {% set article = context.article %}
     <div class="d-flex flex-row bd-highlight mb-3">
         <div class="col-md-auto text-center align-self-top pt-5">
-            <a href="{{ article.author.url_profile() }}">
+            <a href="{{ article.author.url_profile }}">
                 <span class="fs-3 fst-italic">{{ article.author.username }}</span>
                 <br>
-                <img class="avatar thumb m-2" src="{{ article.author.url_avatar() }}">
+                <img class="avatar thumb m-2" src="{{ article.author.url_avatar }}">
             </a>
             <div class="px-3">
-                Дата регистрации: {{ article.author.date.date().strftime("%d.%m.%y") }}, {{
-                article.author.date.time().strftime("%H:%M") }}
+                Дата регистрации: {{ article.author.info.date.date().strftime("%d.%m.%y") }}, {{
+                article.author.info.date.time().strftime("%H:%M") }}
                 <br>
                 Написано статей: {{ article.author.articles|length }}
             </div>
@@ -44,8 +44,8 @@
                         {% endif %}
                         {% if current_user.id == article.author_id %}
                         <div class="col left-buttons">
-                            <a class="btn btn-sm btn-danger" href="/posts/{{ article.id }}/del">Удалить</a>
-                            <a class="btn btn-sm btn-success" href="/posts/{{ article.id}}/update">Редактировать</a>
+                            <a class="btn btn-sm btn-danger" href="{{ article.delete_url }}">Удалить</a>
+                            <a class="btn btn-sm btn-success" href="{{ article.update_url }}">Редактировать</a>
                         </div>
                         {% endif %}
                     </div>
@@ -67,14 +67,14 @@
     {% if form != None %}
     <div class="d-flex flex-row bd-highlight mb-3">
         <div class="col-md-auto text-center align-self-top pt-5">
-            <a href="{{ current_user.url_profile() }}">
+            <a href="{{ current_user.url_profile }}">
                 <span class="fs-3 fst-italic">{{ current_user.username }}</span>
                 <br>
-                <img class="avatar thumb m-2" src="{{ current_user.url_avatar() }}">
+                <img class="avatar thumb m-2" src="{{ current_user.url_avatar }}">
             </a>
             <div class="px-3">
-                Дата регистрации: {{ current_user.date.date().strftime("%d.%m.%y") }}, {{
-                current_user.date.time().strftime("%H:%M") }}
+                Дата регистрации: {{ current_user.info.date.date().strftime("%d.%m.%y") }}, {{
+                current_user.info.date.time().strftime("%H:%M") }}
                 <br>
                 Написано статей: {{ current_user.articles|length }}
             </div>
@@ -101,14 +101,14 @@
     {% for comment in article.comments %}
     <div class="d-flex flex-row bd-highlight mb-3">
         <div class="col-md-auto text-center align-self-center pt-2">
-            <a href="{{ comment.author.url_profile() }}">
+            <a href="{{ comment.author.url_profile }}">
                 <span class="fs-3 fst-italic">{{ comment.author.username }}</span>
                 <br>
-                <img class="avatar thumb m-2" src="{{ comment.author.url_avatar() }}">
+                <img class="avatar thumb m-2" src="{{ comment.author.url_avatar }}">
             </a>
             <br>
-            Дата регистрации: {{ comment.author.date.date().strftime("%d.%m.%y") }}, {{
-            comment.author.date.time().strftime("%H:%M") }}
+            Дата регистрации: {{ comment.author.info.date.date().strftime("%d.%m.%y") }}, {{
+            comment.author.info.date.time().strftime("%H:%M") }}
             <br>
             Написано статей: {{ comment.author.articles|length }}
         </div>
@@ -118,8 +118,12 @@
                 <div class="row">
                     <div class="col left-buttons">
                         {% if current_user.id == comment.author_id %}
-                        <a class="btn btn-sm btn-danger" href="{{ comment.delete() }}">Удалить</a>
-                        <a class="btn btn-sm btn-success" href="{{ comment.edit() }}">Редактировать</a>
+                        <a class="btn btn-sm btn-danger" href="{{ comment.delete_url }}">Удалить</a>
+                        <a class="btn btn-sm btn-success" href="{{ comment.update_url }}">Редактировать</a>
+                        {% else %}
+                        <form action="" method="POST">
+                            <button class="btn btn-sm btn-primary" href=#>Оставить комментарий</button>
+                        </form>
                         {% endif %}
                     </div>
                     <div class="col">

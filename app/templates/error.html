@@ -2,8 +2,8 @@
 
 {% block content %}
 <div class="container" style="width: 50%">
-    <h1>Ошибка №{{context.error.code}}.</h1>
-    <p class="fs-3">{{context.error.description}}</p>
+    <h1>Ошибка №{{context.code}}</h1>
+    <p class="fs-3">{{context.message}}</p>
 </div>
 {{super()}}
 {% endblock %}

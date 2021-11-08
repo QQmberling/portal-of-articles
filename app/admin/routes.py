@@ -3,8 +3,9 @@ import sqlite3
 
 from flask import render_template, url_for, redirect, session, request, flash
 from flask_login import login_required
-from . import admin
+
 from app.models import Article, User
+from . import admin
 
 menu = [{'url': '.index', 'title': 'Панель'},
         {'url': '.listusers', 'title': 'Список пользователей'},

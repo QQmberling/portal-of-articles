@@ -1,23 +1,23 @@
+from flask import jsonify
 from werkzeug.exceptions import HTTPException
-from flask import jsonify, request, abort
+
 from app.exceptions import ValidationError
-from . import api
+from . import blueprint
 
 
-@api.before_request
-def accept_only_json():
-    if request.method in ['POST', 'PUT'] and (request.content_length == 0 or not request.is_json):
-        return bad_request('request is not json')
+@blueprint.before_request
+def before_req():
+    pass
 
 
-@api.errorhandler(HTTPException)
+@blueprint.errorhandler(HTTPException)
 def http_error_handler(e):
-    response = jsonify({'error': e.description})
+    response = jsonify({'error': e.code, 'message': e.description})
     response.status_code = e.code
     return response
 
 
-@api.errorhandler(ValidationError)
+@blueprint.errorhandler(ValidationError)
 def validation_error(e):
     return bad_request(e.args[0])
 

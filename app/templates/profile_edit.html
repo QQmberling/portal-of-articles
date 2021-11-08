@@ -29,7 +29,7 @@
                 <div class="col">
                     {{ form.hidden_tag() }}
                     <div class="d-flex justify-content-center">
-                        <img class="avatar m-2" src="{{ current_user.url_avatar() }}">
+                        <img class="avatar m-2" src="{{ current_user.url_avatar }}">
                     </div>
                     <p class="text-center px-3">{{form.avatar(class='form-control-file')}}</p>
                 </div>
@@ -76,14 +76,15 @@
                                 </div>
                             </div>
                         </li>
-                        <li class="list-group-item">Дата регистрации: {{ current_user.date.date().strftime("%d.%m.%y")
-                            }}, {{ current_user.date.time().strftime("%H:%M") }}
+                        <li class="list-group-item">Дата регистрации: {{
+                            current_user.info.date.date().strftime("%d.%m.%y")
+                            }}, {{ current_user.info.date.time().strftime("%H:%M") }}
                         </li>
-                        <li class="list-group-item">Написано статей: {{ current_user.count_articles() }}</li>
-                        <li class="list-group-item">Написано комментариев: {{ current_user.count_comments() }}</li>
+                        <li class="list-group-item">Написано статей: {{ current_user.count_articles }}</li>
+                        <li class="list-group-item">Написано комментариев: {{ current_user.count_comments }}</li>
                         <li class="list-group-item">Последняя активность: {{
-                            current_user.last_seen.date().strftime("%d.%m.%y") }}, {{
-                            current_user.last_seen.time().strftime("%H:%M") }}
+                            current_user.info.last_seen.date().strftime("%d.%m.%y") }}, {{
+                            current_user.info.last_seen.time().strftime("%H:%M") }}
                         </li>
                     </ul>
                 </div>

@@ -4,12 +4,12 @@
 {{ super() }}
 <h1>{{title}}</h1>
 <ul class="list-posts">
-{% for p in list %}
-<li>
-<p class="title">Айди пользователя: {{p.id}}</p>
-<p class="annonce">Логин пользователя: {{p.username }}</p>
-<p>Дата регистрации: {{p.date}}</p>
-</li>
-{% endfor %}
+    {% for p in list %}
+    <li>
+        <p class="title">Айди пользователя: {{p.id}}</p>
+        <p class="annonce">Логин пользователя: {{p.username }}</p>
+        <p>Дата регистрации: {{p.date}}</p>
+    </li>
+    {% endfor %}
 </ul>
 {% endblock %}

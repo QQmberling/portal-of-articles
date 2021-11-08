@@ -1,102 +1,112 @@
-from flask import jsonify, request, g
+from flask import request, g
 from flask_restx import Resource, fields
-from marshmallow import Schema, fields as FM
+from werkzeug.datastructures import FileStorage
 
+from . import np_user
+from .articles import articles_list_fields
 from .authentication import token_auth
-from . import api
-from .errors import bad_request, forbidden
-from ..models import User, UserInfo
-from .. import db, api_
+from .comments import comments_list_fields
+from .validators import str_with_min_length, str_with_max_length, email, username
+from ..models import User
 
-name_space = api_.namespace('', description='API Project')
-
-class UserSchema(Schema):
-    id = FM.Int()
-    detail = FM.Str()
-
-
-logSwagger = api_.model('UserInfo', {
-    'detail': fields.String(required=True, description='JOPA CONTENT')
+user_fields = np_user.model('User', {
+    'id': fields.Integer(required=True),
+    'url': fields.String(required=True),
+    'username': fields.String(required=True),
+    'email': fields.String(required=True),
+    'first_name': fields.String(required=True, attribute=lambda x: x.info.first_name),
+    'last_name': fields.String(required=True, attribute=lambda x: x.info.last_name),
+    'gender': fields.String(required=True, attribute=lambda x: x.info.gender),
+    'about': fields.String(required=True, attribute=lambda x: x.info.about),
+    'date': fields.DateTime(required=True, dt_format='rfc822', attribute=lambda x: x.info.date),
+    'last_seen': fields.DateTime(required=True, dt_format='rfc822', attribute=lambda x: x.info.last_seen),
+    'count_articles': fields.Integer(required=True),
+    'articles': fields.String(required=True, attribute=lambda user: [art.url for art in user.articles]),
+    'count_comments': fields.Integer(required=True),
+    'comments': fields.String(required=True, attribute=lambda user: [comment.url for comment in user.comments]),
 })
 
-schema = UserSchema()
+users_list_fields = np_user.model('UserList', {
+    'users': fields.List(fields.Nested(user_fields))
+})
 
-@name_space.route("/usersss")
-class UsersList(Resource):
+user_parser = np_user.parser()
+user_parser.add_argument('first_name', location=['json', 'form'], type=str_with_max_length(30))
+user_parser.add_argument('last_name', location=['json', 'form'], type=str_with_max_length(30))
+user_parser.add_argument('gender', location=['json', 'form'], choices=('М', 'Ж'), help='Bad choice. Available: (М, Ж).')
+user_parser.add_argument('about', location=['json', 'form'], type=str_with_max_length(230))
+user_parser.add_argument('avatar', location='files', type=FileStorage)
+
+registration_parser = np_user.parser()
+registration_parser.add_argument('email', location='json', type=email(), required=True)
+registration_parser.add_argument('username', location='json', type=username(), required=True)
+registration_parser.add_argument('password', location='json', type=str_with_min_length(4), required=True)
+
+
+@np_user.route("/")
+class Users(Resource):
+    @np_user.marshal_list_with(users_list_fields)
     def get(self):
-        return {
-            "status": "List all users"
-        }
-    @name_space.expect(logSwagger)
+        users = User.query.all()
+        return {'users': users}
+
+    @np_user.expect(registration_parser)
+    @np_user.marshal_with(user_fields)
     def post(self):
+        args = registration_parser.parse_args(strict=True)
         payload = request.get_json()
-        user = User.fr
-        return {
-            "data": schema.dump(userinfo)
-        }
+        user = User.create(payload)
+        return user
 
 
-@api.route('/users/')
-def all_users():
-    users = User.get_users()
-    return jsonify({'users': [user.to_json() for user in users]})
+@np_user.route("/authors/")
+class Authors(Resource):
+    @np_user.marshal_list_with(users_list_fields)
+    def get(self):
+        users = User.get_authors()
+        return {'users': users}
 
 
-@api.route('/authors/')
-def all_authors():
-    authors = User.get_authors()
-    return jsonify({'authors': [author.to_json() for author in authors]})
-
-
-@api.route('/users/<int:id>')
-def get_user(id):
-    try:
+@np_user.route("/<int:id>/")
+@np_user.param("id", "The user identifier")
+class SingleUser(Resource):
+    @np_user.marshal_with(user_fields)
+    def get(self, id):
         user = User.query.get_or_404(id)
-    except:
-        return bad_request("user doesn't exist")
-    return jsonify(user.to_json())
+        return user
 
-
-@api.route('/users/<int:id>/articles/')
-def get_user_articles(id):
-    try:
+    @token_auth.login_required
+    @np_user.doc(security='apikey')
+    @np_user.expect(user_parser)
+    @np_user.marshal_with(user_fields)
+    def put(self, id):
         user = User.query.get_or_404(id)
-    except:
-        return bad_request("user doesn't exist")
-    articles = user.articles
-    return jsonify({'articles': [article.to_json() for article in articles]})
+        if g.current_user.id != user.id:
+            np_user.abort(403)
+        args = user_parser.parse_args(strict=True)
+        args = dict(args)
+        payload = {k: v for k, v in args.items() if v is not None}
+        if not payload:
+            np_user.abort(400, message='Empty request.')
+        user = user.upd(payload)
+        return user
 
 
-@api.route('/users/<int:id>/comments/')
-def get_user_comments(id):
-    try:
+@np_user.route('/<int:id>/articles/')
+@np_user.param("id", "The user identifier")
+class UserArticles(Resource):
+    @np_user.marshal_list_with(articles_list_fields)
+    def get(self, id):
         user = User.query.get_or_404(id)
-    except:
-        return bad_request("user doesn't exist")
-    comments = user.comments
-    return jsonify({'comments': [comment.to_json() for comment in comments]})
+        articles = user.articles
+        return {'articles': articles}
 
 
-@api.route('/users/<int:id>', methods=['PUT'])
-@token_auth.login_required
-def update_user(id):
-    try:
+@np_user.route('/<int:id>/comments/')
+@np_user.param("id", "The user identifier")
+class UserComments(Resource):
+    @np_user.marshal_list_with(comments_list_fields)
+    def get(self, id):
         user = User.query.get_or_404(id)
-    except:
-        return bad_request("user doesn't exist")
-    if g.current_user.id != id:
-        return forbidden(f'you aren\'t user with id={id}')
-    fields = User.api_fields()
-    userinfo = UserInfo.query.filter(UserInfo.id == id)
-    json = request.get_json()
-    for key in json:
-        if key not in fields:
-            db.session.remove()
-            return bad_request(f'field "{key}" doesn\'t exist or can\'t be changed')
-        try:
-            userinfo.update({key: json[key]})
-        except:
-            db.session.remove()
-            return bad_request(f'not valid data at "{key}" field')
-    db.session.commit()
-    return user.to_json()
+        comments = user.comments
+        return {'comments': comments}

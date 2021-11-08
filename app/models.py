@@ -1,14 +1,15 @@
+import datetime as D
 from datetime import datetime
 
+import jwt
 from flask import url_for, current_app
 from flask_login import UserMixin
-from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy import func
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from werkzeug.security import check_password_hash, generate_password_hash
 
-from app.exceptions import ValidationError
-from app import db, TIMEZONE
+from app import db
 from app.image import save_image
+from config import TIMEZONE
 
 
 class Article(db.Model):
@@ -19,45 +20,51 @@ class Article(db.Model):
     date = db.Column(db.DateTime, default=datetime.now(TIMEZONE))
     edit_date = db.Column(db.DateTime, default=None)
     able_to_comment = db.Column(db.Boolean, default=True)
-    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    author = db.relationship('User', backref=db.backref('articles', lazy=True))
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"), nullable=False)
+    author = db.relationship('User', backref=db.backref('articles', lazy=True, cascade="all,delete,delete-orphan"))
 
     def __repr__(self):
         return '<Article %r - %r>' % (self.id, self.title)
 
-    def to_json(self):
-        json_article = {
-            'id': self.id,
-            'url': url_for('api.get_article', id=self.id),
-            'title': self.title,
-            'intro': self.intro,
-            'text': self.text,
-            'date': self.date,
-            'edit_date': self.edit_date,
-            'able_to_comment': self.able_to_comment,
-            'author_id': self.author_id,
-            'author_url': url_for('api.get_user', id=self.author_id),
-            'comments': [comment.to_json()['url'] for comment in self.comments],
-        }
-        return json_article
-
     @staticmethod
-    def from_json(json_article, author_id):
-        title = json_article.get('title')
-        intro = json_article.get('intro')
-        text = json_article.get('text')
-        if title is None or title == '' or intro is None or intro == '' or text is None or text == '':
-            raise ValidationError('title, intro, text must be filled')
-        return Article(title=title, intro=intro, text=text, author_id=author_id)
+    def create(json):
+        if 'able_to_comment' in json:
+            json['able_to_comment'] = int(json['able_to_comment'])
+        article = Article(**json)
+        db.session.add(article)
+        db.session.commit()
+        return article
 
-    @staticmethod
-    def get_articles():
-        articles = Article.query.all()
-        return articles
+    def upd(self, json):
+        json['edit_date'] = datetime.now(TIMEZONE)
+        Article.query.filter(Article.id == self.id).update(json)
+        db.session.commit()
+        return self
 
-    @staticmethod
-    def api_fields():
-        return 'title', 'intro', 'text', 'able_to_comment'
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def new(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    @property
+    def url(self):
+        return url_for('api.articles_single_article', id=self.id, _external=True)
+
+    @property
+    def author_url(self):
+        return url_for('api.users_single_user', id=self.author_id, _external=True)
+
+    @property
+    def delete_url(self):
+        return url_for('main.article_delete', id=self.id)
+
+    @property
+    def update_url(self):
+        return url_for('main.article_update', id=self.id)
 
 
 class User(db.Model, UserMixin):
@@ -65,12 +72,44 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(30), nullable=False, unique=True)
     password_hash = db.Column(db.String(128), nullable=False)
     email = db.Column(db.String(64), unique=True)
-    picture_name = db.Column(db.String(20), nullable=False, default='default_male.png')
-    date = db.Column(db.DateTime, default=datetime.now(TIMEZONE))
-    last_seen = db.Column(db.DateTime, default=datetime.now(TIMEZONE))
 
     def __repr__(self):
         return '<User %r - %r>' % (self.id, self.username)
+
+    @staticmethod
+    def create(json):
+        json['email'] = json['email'].lower()
+        user = User(**json)
+        userinfo = UserInfo()
+        db.session.add(user)
+        db.session.add(userinfo)
+        db.session.commit()
+        return user
+
+    def upd(self, json):
+        if 'avatar' in json and json['avatar'] is not None:
+            picture_name = self.update_avatar(json.pop('avatar'))
+            if picture_name:
+                json['picture_name'] = picture_name
+        UserInfo.query.filter(UserInfo.id == self.id).update(json)
+        db.session.commit()
+        return self
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def new(self):
+        db.session.add(self)
+        db.session.commit()
+        userinfo = UserInfo()
+        db.session.add(userinfo)
+        db.session.commit()
+        return self
+
+    @property
+    def url(self):
+        return url_for('api.users_single_user', id=self.id, _external=True)
 
     @property
     def password(self):
@@ -83,88 +122,62 @@ class User(db.Model, UserMixin):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    @property
     def count_articles(self):
         return len(self.articles)
 
+    @property
     def count_comments(self):
         return len(self.comments)
 
+    @property
     def url_profile(self):
-        return url_for('.profile_with_login', username=self.username)
+        return url_for('main.profile_with_login', username=self.username)
 
+    @property
     def url_avatar(self):
-        return url_for('static', filename=f'profile_pics/{self.picture_name}')
+        return url_for('static', filename=f'profile_pics/{self.info.picture_name}')
 
-    def save_avatar(self, picture_file):
-        return save_image(self.id, picture_file)
-
-    def to_json(self):
-        json_user = {
-            'id': self.id,
-            'url': url_for('api.get_user', id=self.id),
-            'username': self.username,
-            'email': self.email,
-            'first_name': self.info.first_name,
-            'last_name': self.info.last_name,
-            'gender': self.info.gender,
-            'about': self.info.about,
-            'register_date': self.date,
-            'last_seen': self.last_seen,
-            'count_articles': self.count_articles(),
-            'articles': [article.to_json()['url'] for article in self.articles],
-            'count_comments': self.count_comments(),
-            'comments': [comment.to_json()['url'] for comment in self.comments],
-        }
-        return json_user
-
-    # def edit(self, json):
-    #     try:
-    #         self.q
-    #     if title is None or title == '' or intro is None or intro == '' or text is None or text == '':
-    #         raise ValidationError('title, intro, text must be filled')
-    #     return Article(title=title, intro=intro, text=text)
-
-    # def update(self, updates):
-    #     for i in updates.
+    def update_avatar(self, picture_file):
+        return save_image(self.id, picture_file, self.info.picture_name)
 
     @staticmethod
     def get_authors():
         # full_query = db.session.query(User.username, func.count(Article.id)).group_by(Article.author_id).join(User, Article.author_id == User.id).order_by(func.count(Article.id).desc()).all()
-        subquery = db.session.query(Article.author_id, func.count(Article.id).label('count')).group_by(Article.author_id).subquery()
+        subquery = db.session.query(Article.author_id, func.count(Article.id).label('count')).group_by(
+            Article.author_id).subquery()
         authors = User.query.join(subquery, subquery.c.author_id == User.id).order_by(subquery.c.count.desc()).all()
         return authors
 
-    @staticmethod
-    def get_users():
-        users = User.query.all()
-        return users
-
-    def generate_auth_token(self, expiration):
-        s = Serializer(current_app.config['SECRET_KEY'],
-                       expires_in=expiration)
-        return s.dumps({'id': self.id}).decode('utf-8')
+    def generate_auth_token(self, expiration=3600):
+        token = jwt.encode({"id": self.id, 'exp': datetime.now(TIMEZONE) + D.timedelta(seconds=expiration)},
+                           current_app.config['SECRET_KEY'],
+                           algorithm="HS256")
+        return token
 
     @staticmethod
     def verify_auth_token(token):
-        s = Serializer(current_app.config['SECRET_KEY'])
         try:
-            data = s.loads(token)
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
         except:
             return None
         return User.query.get(data['id'])
 
-    @staticmethod
-    def api_fields():
-        return 'first_name', 'last_name', 'gender', 'about'
+    def ping(self):
+        self.info.last_seen = datetime.now(TIMEZONE)
+        db.session.commit()
 
 
 class UserInfo(db.Model):
-    id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"), primary_key=True, autoincrement=True)
     first_name = db.Column(db.String(30), nullable=True)
     last_name = db.Column(db.String(30), nullable=True)
     about = db.Column(db.String(), nullable=True)
-    gender = db.Column(db.String(1), default='М')
-    user = db.relationship('User', backref=db.backref('info', lazy=True, uselist=False))
+    gender = db.Column(db.String(1))
+    picture_name = db.Column(db.String(200), nullable=False, default='defaults/default_male.png')
+    date = db.Column(db.DateTime, default=datetime.now(TIMEZONE))
+    last_seen = db.Column(db.DateTime, default=datetime.now(TIMEZONE))
+    user = db.relationship('User', backref=db.backref('info', uselist=False, cascade="all,delete,delete-orphan"))
 
 
 class Comment(db.Model):
@@ -172,39 +185,49 @@ class Comment(db.Model):
     text = db.Column(db.Text(), nullable=False)
     date = db.Column(db.DateTime, default=datetime.now(TIMEZONE))
     edit_date = db.Column(db.DateTime, default=None)
-    article_id = db.Column(db.Integer, db.ForeignKey('article.id'))
-    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    source = db.relationship('Article', backref=db.backref('comments', lazy=True))
-    author = db.relationship('User', backref=db.backref('comments', lazy=True))
+    article_id = db.Column(db.Integer, db.ForeignKey('article.id', ondelete="CASCADE"))
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"))
+    article = db.relationship('Article', backref=db.backref('comments', lazy=True, cascade="all,delete,delete-orphan"))
+    author = db.relationship('User', backref=db.backref('comments', lazy=True, cascade="all,delete,delete-orphan"))
+
+    @staticmethod
+    def create(json):
+        comment = Comment(**json)
+        db.session.add(comment)
+        db.session.commit()
+        return comment
+
+    def upd(self, json):
+        json['edit_date'] = datetime.now(TIMEZONE)
+        Comment.query.filter(Comment.id == self.id).update(json)
+        db.session.commit()
+        return self
 
     def delete(self):
-        return url_for('.comment_delete', id=self.id)
+        db.session.delete(self)
+        db.session.commit()
 
-    def edit(self):
-        return url_for('.prank', id=self.id)
+    def new(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
 
-    def to_json(self):
-        json_comment = {
-            'id': self.id,
-            'url': url_for('api.get_comment', id=self.id),
-            'text': self.text,
-            'date': self.date,
-            'edit_date': self.edit_date,
-            'article_id': self.article_id,
-            'article_url': url_for('api.get_article', id=self.article_id),
-            'author_id': self.author_id,
-            'author_url': url_for('api.get_user', id=self.author_id),
-        }
-        return json_comment
+    @property
+    def url(self):
+        return url_for('api.comments_single_comment', id=self.id, _external=True)
 
-    @staticmethod
-    def from_json(json_comment, article_id, author_id):
-        text = json_comment.get('text')
-        if text is None or text == '':
-            raise ValidationError('text must be filled')
-        return Comment(text=text, article_id=article_id, author_id=author_id)
+    @property
+    def article_url(self):
+        return url_for('api.articles_single_article', id=self.article_id, _external=True)
 
-    @staticmethod
-    def get_comments():
-        comments = Comment.query.all()
-        return comments
+    @property
+    def author_url(self):
+        return url_for('api.users_single_user', id=self.author_id, _external=True)
+
+    @property
+    def delete_url(self):
+        return url_for('main.comment_delete', id=self.id)
+
+    @property
+    def update_url(self):
+        return url_for('main.prank', id=self.id)

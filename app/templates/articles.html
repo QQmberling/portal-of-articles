@@ -5,7 +5,7 @@
     {% if context.articles|length != 0 %}
     {% for article in context.articles %}
     <div class="alert alert-info">
-        <a href="/posts/{{ article.id }}">
+        <a href="/articles/{{ article.id }}">
             <span class="text-center"><h2>{{ article.title }}</h2></span>
         </a>
         <div class="d-flex justify-content-center">
@@ -18,7 +18,7 @@
 
             </div>
             <div class="col text-center">
-                <a href="/posts/{{ article.id }}">
+                <a href="/articles/{{ article.id }}">
                     <p class="fs-4 text-primary">Читать далее...</p>
                 </a>
             </div>
@@ -27,7 +27,7 @@
                 <p>
                     <b>Дата: {{ article.date.date().strftime("%d.%m.%y") }}, {{ article.date.time().strftime("%H:%M") }}
                         <br>
-                        Автор: <a href="{{ article.author.url_profile() }}"><i>{{ article.author.username }}</i></a>
+                        Автор: <a href="{{ article.author.url_profile }}"><i>{{ article.author.username }}</i></a>
                     </b>
                 </p>
             </div>

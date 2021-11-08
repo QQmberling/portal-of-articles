@@ -1,5 +1,9 @@
 from flask import Blueprint
+from flask_restx import Namespace
 
-api = Blueprint('api', __name__, template_folder='templates', static_folder='static')
+blueprint = Blueprint('api', __name__, url_prefix='/api/v1/')
+np_user = Namespace('users', description='Users')
+np_art = Namespace('articles', description='Articles')
+np_comm = Namespace('comments', description='Comments')
 
 from . import users, articles, comments

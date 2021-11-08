@@ -1,79 +1,120 @@
-from flask import jsonify, request, g, url_for
-from . import api
-from .errors import bad_request, forbidden
-from ..models import Article
+from flask import g, request
+from flask_restx import fields, Resource
+from flask_restx.inputs import boolean
+
+from . import np_art
 from .authentication import token_auth
-from .. import db
+from .comments import comments_list_fields, comment_fields, comment_parser
+from .validators import str_with_min_length
+from ..models import Article, Comment
+
+article_fields = np_art.model('Article', {
+    'id': fields.Integer(required=True),
+    'url': fields.String(required=True),
+    'title': fields.String(required=True),
+    'intro': fields.String(required=True),
+    'text': fields.String(required=True),
+    'date': fields.DateTime(required=True, dt_format='rfc822'),
+    'edit_date': fields.DateTime(required=True, dt_format='rfc822'),
+    'able_to_comment': fields.Boolean(),
+    'author_id': fields.String(required=True),
+    'author_url': fields.String(required=True),
+    'comments': fields.String(required=True, attribute=lambda article: [comment.url for comment in article.comments]),
+})
+
+article_fields_short = np_art.model('ArticleShort', {
+    'id': fields.Integer(required=True),
+    'url': fields.String(required=True),
+    'title': fields.String(required=True),
+    'intro': fields.String(required=True),
+    'date': fields.DateTime(required=True, dt_format='rfc822'),
+})
+
+articles_list_fields = np_art.model('ArticlesList', {
+    'articles': fields.List(fields.Nested(article_fields_short)),
+})
+
+article_parser = np_art.parser()
+article_parser.add_argument('title', location='json', type=str_with_min_length(1), required=True)
+article_parser.add_argument('intro', location='json', type=str_with_min_length(4), required=True)
+article_parser.add_argument('text', location='json', type=str_with_min_length(30), required=True)
+article_parser.add_argument('able_to_comment', location='json', type=boolean)
+
+article_parser_updating = np_art.parser()
+article_parser_updating.add_argument('title', location='json', type=str_with_min_length(1))
+article_parser_updating.add_argument('intro', location='json', type=str_with_min_length(4))
+article_parser_updating.add_argument('text', location='json', type=str_with_min_length(30))
+article_parser_updating.add_argument('able_to_comment', location='json', type=boolean)
 
 
-@api.route('/articles/')
-def all_articles():
-    articles = Article.get_articles()
-    return jsonify({'articles': [article.to_json() for article in articles]})
+@np_art.route("/")
+class Articles(Resource):
+    @np_art.marshal_list_with(articles_list_fields)
+    def get(self):
+        articles = Article.query.all()
+        return {'articles': articles}
+
+    @token_auth.login_required
+    @np_art.doc(security='apikey')
+    @np_art.expect(article_parser)
+    @np_art.marshal_with(article_fields)
+    def post(self):
+        args = article_parser.parse_args(strict=True)
+        payload = request.get_json()
+        payload['author_id'] = g.current_user.id
+        article = Article.create(payload)
+        return article
 
 
-@api.route('/articles/<int:id>')
-def get_article(id):
-    try:
+@np_art.route("/<int:id>/")
+@np_art.param("id", "The article identifier")
+class SingleArticle(Resource):
+    @np_art.marshal_with(article_fields)
+    def get(self, id):
         article = Article.query.get_or_404(id)
-    except:
-        return bad_request("article doesn't exist")
-    return jsonify(article.to_json())
+        return article
 
-
-@api.route('/articles/<int:id>/comments/')
-def get_article_comments(id):
-    try:
+    @token_auth.login_required
+    @np_art.doc(security='apikey')
+    @np_art.expect(article_parser_updating)
+    @np_art.marshal_with(article_fields)
+    def put(self, id):
         article = Article.query.get_or_404(id)
-    except:
-        return bad_request("article doesn't exist")
-    comments = article.comments
-    return jsonify({'comments': [comment.to_json() for comment in comments]})
+        if g.current_user.id != article.author_id:
+            np_art.abort(403)
+        args = article_parser_updating.parse_args(strict=True)
+        payload = request.get_json()
+        article = article.upd(payload)
+        return article
 
-
-@api.route('/articles/', methods=['POST'])
-@token_auth.login_required
-def new_article():
-    article = Article.from_json(request.json, g.current_user.id)
-    db.session.add(article)
-    db.session.commit()
-    return jsonify(article.to_json()), 201
-
-
-@api.route('/articles/<int:id>', methods=['PUT'])
-@token_auth.login_required
-def update_article(id):
-    try:
+    @token_auth.login_required
+    @np_art.doc(security='apikey')
+    def delete(self, id):
         article = Article.query.get_or_404(id)
-    except:
-        return bad_request("article doesn't exist")
-    if article.author_id != g.current_user.id:
-        return forbidden(f'you aren\'t author of article with id={id}')
-    fields = Article.api_fields()
-    article_query = Article.query.filter(Article.id == id)
-    json = request.get_json()
-    for key in json:
-        if key not in fields:
-            db.session.remove()
-            return bad_request(f'field "{key}" doesn\'t exist or can\'t be changed')
-        try:
-            article_query.update({key: json[key]})
-        except:
-            db.session.remove()
-            return bad_request(f'not valid data at "{key}" field')
-    db.session.commit()
-    return jsonify(article.to_json()), 200
+        if g.current_user.id != article.author_id:
+            np_art.abort(403)
+        article.delete()
+        return {'message': 'successful deleted'}
 
 
-@api.route('/articles/<int:id>', methods=['DELETE'])
-@token_auth.login_required
-def delete_article(id):
-    try:
+@np_art.route('/<int:id>/comments/')
+@np_art.param("id", "The article identifier")
+class ArticleComments(Resource):
+    @np_art.marshal_list_with(comments_list_fields)
+    def get(self, id):
         article = Article.query.get_or_404(id)
-    except:
-        return bad_request("article doesn't exist")
-    if article.author_id != g.current_user.id:
-        return forbidden(f'you aren\'t author of article with id={id}')
-    db.session.delete(article)
-    db.session.commit()
-    return jsonify({'status': 'successfully deleted'}), 200
+        comments = article.comments
+        return {'comments': comments}
+
+    @token_auth.login_required
+    @np_art.doc(security='apikey')
+    @np_art.expect(comment_parser)
+    @np_art.marshal_with(comment_fields)
+    def post(self, id):
+        article = Article.query.get_or_404(id)
+        args = comment_parser.parse_args(strict=True)
+        payload = request.get_json()
+        payload['article_id'] = id
+        payload['author_id'] = g.current_user.id
+        comment = Comment.create(payload)
+        return comment

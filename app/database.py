@@ -2,7 +2,8 @@ from app import db
 
 
 def create_db():
-    tables = db.engine.table_names()  # db.metadata.tables.keys() альтернатива
+    # tables = db.metadata.tables.keys()
+    tables = db.engine.table_names()
     print('Загружены таблицы: ', tables)
     if len(tables) == 0:
         db.create_all()
@@ -15,8 +16,3 @@ def create_db():
 def drop_db():
     db.drop_all()
     print('Все таблицы успешно удалены')
-
-    #
-    # db_is_created = os.path.exists(f'app/{DBNAME}')
-    # if not db_is_created:
-    #     db.create_all()
