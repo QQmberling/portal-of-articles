@@ -6,7 +6,7 @@ from dotenv import load_dotenv, get_key
 basedir = path.abspath(path.dirname(__file__))
 load_dotenv(path.join(basedir, '.env'))
 
-diff = int(get_key(dotenv_path=path.join(basedir, '.env'), key_to_get='TIMEZONE')) or 3
+diff = int(environ.get('TIMEZONE')) or 3
 TIMEZONE = datetime.timezone(datetime.timedelta(hours=diff))
 
 
