@@ -1,5 +1,5 @@
-import datetime as D
-from datetime import datetime
+import datetime
+import os
 
 import jwt
 from flask import url_for, current_app
@@ -9,7 +9,6 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db
 from app.image import save_image
-from config import TIMEZONE
 
 
 class Article(db.Model):
@@ -17,8 +16,8 @@ class Article(db.Model):
     title = db.Column(db.String(100), nullable=False)
     intro = db.Column(db.String(300), nullable=False)
     text = db.Column(db.Text, nullable=False)
-    date = db.Column(db.DateTime, default=datetime.now(TIMEZONE))
-    edit_date = db.Column(db.DateTime, default=None)
+    date = db.Column(db.DateTime(), default=func.now())
+    edit_date = db.Column(db.DateTime(), default=None)
     able_to_comment = db.Column(db.Boolean, default=True)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"), nullable=False)
     author = db.relationship('User', backref=db.backref('articles', lazy=True, cascade="all,delete,delete-orphan"))
@@ -36,7 +35,7 @@ class Article(db.Model):
         return article
 
     def upd(self, json):
-        json['edit_date'] = datetime.now(TIMEZONE)
+        json['edit_date'] = func.now()
         Article.query.filter(Article.id == self.id).update(json)
         db.session.commit()
         return self
@@ -136,6 +135,13 @@ class User(db.Model, UserMixin):
 
     @property
     def url_avatar(self):
+        """ Статические файлы на хостинге хероку постоянно удаляются, поэтому
+            картинка будет заменяться на стандартную, если оригинальная не нашлась.
+         """
+        if not os.path.isfile(os.path.join(current_app.root_path,
+                                           url_for('static', filename=f'profile_pics/{self.info.picture_name}')[1:])):
+            self.info.picture_name = ('М' == self.info.gender) * 'defaults/default_male.png' + \
+                                     ('М' != self.info.gender) * 'defaults/default_female.png'
         return url_for('static', filename=f'profile_pics/{self.info.picture_name}')
 
     def update_avatar(self, picture_file):
@@ -150,7 +156,8 @@ class User(db.Model, UserMixin):
         return authors
 
     def generate_auth_token(self, expiration=3600):
-        token = jwt.encode({"id": self.id, 'exp': datetime.now(TIMEZONE) + D.timedelta(seconds=expiration)},
+        token = jwt.encode({"id": self.id, 'exp': datetime.datetime.now(tz=datetime.timezone.utc) + datetime.timedelta(
+            seconds=expiration)},
                            current_app.config['SECRET_KEY'],
                            algorithm="HS256")
         return token
@@ -164,7 +171,7 @@ class User(db.Model, UserMixin):
         return User.query.get(data['id'])
 
     def ping(self):
-        self.info.last_seen = datetime.now(TIMEZONE)
+        self.info.last_seen = func.now()
         db.session.commit()
 
 
@@ -175,15 +182,15 @@ class UserInfo(db.Model):
     about = db.Column(db.String(), nullable=True)
     gender = db.Column(db.String(1))
     picture_name = db.Column(db.String(200), nullable=False, default='defaults/default_male.png')
-    date = db.Column(db.DateTime, default=datetime.now(TIMEZONE))
-    last_seen = db.Column(db.DateTime, default=datetime.now(TIMEZONE))
+    date = db.Column(db.DateTime, default=func.now())
+    last_seen = db.Column(db.DateTime, default=func.now())
     user = db.relationship('User', backref=db.backref('info', uselist=False, cascade="all,delete,delete-orphan"))
 
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Text(), nullable=False)
-    date = db.Column(db.DateTime, default=datetime.now(TIMEZONE))
+    date = db.Column(db.DateTime, default=func.now())
     edit_date = db.Column(db.DateTime, default=None)
     article_id = db.Column(db.Integer, db.ForeignKey('article.id', ondelete="CASCADE"))
     author_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"))
@@ -198,7 +205,7 @@ class Comment(db.Model):
         return comment
 
     def upd(self, json):
-        json['edit_date'] = datetime.now(TIMEZONE)
+        json['edit_date'] = func.now()
         Comment.query.filter(Comment.id == self.id).update(json)
         db.session.commit()
         return self

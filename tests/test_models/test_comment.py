@@ -16,7 +16,7 @@ def test_comment_new(st_user, st_article, st_comment):
     assert comment.date > st_article.date
 
 
-def test_article_create(st_user, st_article, st_comment):
+def test_comment_create(st_user, st_article, st_comment):
     comment = Comment(text='Test Comment', article_id=st_article.id, author_id=st_user.id).new()
     assert comment.id is not None
     assert comment.author.username == 'st_user'

@@ -1,13 +1,9 @@
-import datetime
 from os import environ, path
 
-from dotenv import load_dotenv, get_key
+from dotenv import load_dotenv
 
 basedir = path.abspath(path.dirname(__file__))
 load_dotenv(path.join(basedir, '.env'))
-
-diff = int(environ.get('TIMEZONE')) or 3
-TIMEZONE = datetime.timezone(datetime.timedelta(hours=diff))
 
 
 class Config:
