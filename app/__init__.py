@@ -23,9 +23,6 @@ def create_app(config_name):
     login_manager.login_message_category = app.config['LOGIN_MESSAGE_CATEGORY']
     login_manager.init_app(app)
 
-    from .admin import admin as admin_blueprint
-    app.register_blueprint(admin_blueprint, url_prefix='/admin')
-
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint, url_prefix='/')
 
