@@ -30,8 +30,7 @@ def create_app(config_name):
     api_ = Api(blueprint,
                doc='/docs/',
                authorizations=app.config['AUTHORIZATIONS'],
-               description='<h3>This API allows to interact with website and deal with everything what you can do directly at html pages.</h3>',
-               )
+               description='<h3>Данное API предоставляет те же возможности, что и браузерная версия сайта.</h3>')
     api_.add_namespace(np_user)
     api_.add_namespace(np_art)
     api_.add_namespace(np_comm)
