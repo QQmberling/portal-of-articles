@@ -8,28 +8,30 @@ Allows you to:
 
 * to customize your profile
 
-![Screenshot_1](https://user-images.githubusercontent.com/67502319/140825091-7ad1ec6a-0624-4585-aebe-dfa2133e6581.jpg)
+![Screenshot_1](https://user-images.githubusercontent.com/67502319/140826665-6aed3fca-66aa-407e-bc6e-7785e9f00235.jpg)
 
 * publish your articles
 
-![Screenshot_2](https://user-images.githubusercontent.com/67502319/140824873-cc92bbd4-fbb7-4e63-995f-099b855247f4.jpg)
+![Screenshot_2](https://user-images.githubusercontent.com/67502319/140826700-49a4ae9a-87bb-4160-999d-8c4e4b604e3f.jpg)
 
 * comment articles
 
-![Screenshot_3](https://user-images.githubusercontent.com/67502319/140824908-2f2ec6a2-d5a0-428d-8468-f7fe5c3d9ea8.jpg)
+![Screenshot_3](https://user-images.githubusercontent.com/67502319/140826719-f03028cc-9381-47ee-a107-8a427aa00cc0.jpg)
 
 * see all articles
 
-![Screenshot_4](https://user-images.githubusercontent.com/67502319/140825330-a6656010-c6cc-47ce-93e7-84945a413576.jpg)
+![Screenshot_4](https://user-images.githubusercontent.com/67502319/140826729-96d4ce7b-38f8-4190-a6f0-cf0249adf1f0.jpg)
 
 * see all authors
 
-![Screenshot_5](https://user-images.githubusercontent.com/67502319/140825372-120d241e-a1b2-45ce-b5db-855cf961f3a8.jpg)
+![Screenshot_5](https://user-images.githubusercontent.com/67502319/140826756-83146e43-27e0-4d18-8df0-e1da154f0c19.jpg)
 
 ## API
 
+![Screenshot_6](https://user-images.githubusercontent.com/67502319/140826772-e25da38b-37e2-4eae-af71-4bad44a29722.jpg)
+
+![Screenshot_7](https://user-images.githubusercontent.com/67502319/140826782-6104c639-e649-4da3-89f9-b6ba964a1f00.jpg)
+
 Allows you to do exactly the same things.
 
-![Screenshot_6](https://user-images.githubusercontent.com/67502319/140825836-457d1f03-8951-4235-9b99-df61505bcc48.png)
 
-![Screenshot_6](https://user-images.githubusercontent.com/67502319/140826003-7e0e5557-7ccf-4094-8e06-0d470f62077b.jpg)
