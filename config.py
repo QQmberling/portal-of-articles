@@ -46,14 +46,17 @@ class Config:
 class DevelopmentConfig(Config):
     ENV = 'development'
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = f"postgresql://{environ.get('DB_LOGIN')}:{environ.get('DB_PSW')}@localhost:5432/data-dev"
     TESTING = True
+    SQLALCHEMY_DATABASE_URI = f"postgresql://{environ.get('DB_LOGIN')}:{environ.get('DB_PSW')}@localhost:5432/data-dev"
 
 
 class TestingConfig(Config):
     ENV = 'testing'
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = environ.get('HEROKU_POSTGRESQL_PUCE_URL') or \
+    HEROKU_DB_URL = environ.get('HEROKU_POSTGRESQL_PUCE_URL')
+    if HEROKU_DB_URL:
+        HEROKU_DB_URL = HEROKU_DB_URL[:8] + 'ql' + HEROKU_DB_URL[8:]
+    SQLALCHEMY_DATABASE_URI = HEROKU_DB_URL or \
                               f"postgresql://{environ.get('DB_LOGIN')}:{environ.get('DB_PSW')}@localhost:5432/data-test"
     WTF_CSRF_ENABLED = False
 
@@ -61,9 +64,12 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     ENV = 'production'
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = environ.get('DATABASE_URL') or \
-                              f"postgresql://{environ.get('DB_LOGIN')}:{environ.get('DB_PSW')}@localhost:5432/data-prod"
     TESTING = False
+    HEROKU_DB_URL = environ.get('HEROKU_POSTGRESQL_PUCE_URL')
+    if HEROKU_DB_URL:
+        HEROKU_DB_URL = HEROKU_DB_URL[:8] + 'ql' + HEROKU_DB_URL[8:]
+    SQLALCHEMY_DATABASE_URI = HEROKU_DB_URL or \
+                              f"postgresql://{environ.get('DB_LOGIN')}:{environ.get('DB_PSW')}@localhost:5432/data-prod"
 
 
 config = {
