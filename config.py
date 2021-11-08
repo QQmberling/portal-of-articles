@@ -61,7 +61,7 @@ class ProductionConfig(Config):
     ENV = 'production'
     DEBUG = False
     TESTING = False
-    HEROKU_DB_URL = environ.get('HEROKU_POSTGRESQL_PUCE_URL')
+    HEROKU_DB_URL = environ.get('DATABASE_URL')
     if HEROKU_DB_URL:
         HEROKU_DB_URL = HEROKU_DB_URL[:8] + 'ql' + HEROKU_DB_URL[8:]
     SQLALCHEMY_DATABASE_URI = HEROKU_DB_URL or \
