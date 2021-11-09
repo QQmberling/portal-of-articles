@@ -8,7 +8,7 @@ Allows you to:
 
 * to customize your profile
 
-![Screenshot_1](https://user-images.githubusercontent.com/67502319/140826665-6aed3fca-66aa-407e-bc6e-7785e9f00235.jpg)
+![Screenshot_8](https://user-images.githubusercontent.com/67502319/140837520-ba762b0e-03e9-4e5e-9150-e46939af682b.jpg)
 
 * publish your articles
 
