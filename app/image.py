@@ -45,10 +45,11 @@ def validate_image(picture_file):
     return name_dot_ext, temp_path
 
 
-def save_image(id, picture_file, old_picture_name):
+def save_image(username, picture_file, old_picture_name):
     picture_name, temp_path = validate_image(picture_file)
-    picture_path = os.path.join(current_app.root_path, 'static/profile_pics',
+    picture_path = os.path.join(current_app.root_path, f'static/profile_pics/{username}/',
                                 picture_name)  # Путь для картинки профиля (для отображения в профиле)
+    os.makedirs(os.path.dirname(picture_path), exist_ok=True)
     with Image.open(temp_path) as temp_image:
         temp_image.save(picture_path)
     if 'defaults/' not in old_picture_name:

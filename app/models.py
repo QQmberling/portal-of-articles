@@ -154,10 +154,10 @@ class User(db.Model, UserMixin):
         return url_for('static', filename=f'profile_pics/{self.info.picture_name}')
 
     def update_avatar(self, picture_file):
-        picture_name, picture_file = save_image(self.id, picture_file, self.info.picture_name)
+        picture_name, picture_file = save_image(self.username, picture_file, self.info.picture_name)
         picture_file.stream.seek(0) # Так как уже вызывался .read() в image.py , то нужно отмотать в начало бинарник
         self.info.picture_file = picture_file.read()
-        self.info.picture_name = picture_name
+        self.info.picture_name = f'{self.username}/{picture_name}'
         db.session.commit()
 
     @staticmethod
