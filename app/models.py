@@ -1,4 +1,5 @@
 import datetime
+import io
 import os
 
 import jwt
@@ -6,6 +7,7 @@ from flask import url_for, current_app
 from flask_login import UserMixin
 from sqlalchemy import func
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.datastructures import FileStorage
 
 from app import db
 from app.image import save_image
@@ -87,9 +89,7 @@ class User(db.Model, UserMixin):
 
     def upd(self, json):
         if 'avatar' in json and json['avatar'] is not None:
-            picture_name = self.update_avatar(json.pop('avatar'))
-            if picture_name:
-                json['picture_name'] = picture_name
+            self.update_avatar(json.pop('avatar'))
         UserInfo.query.filter(UserInfo.id == self.id).update(json)
         db.session.commit()
         return self
@@ -136,16 +136,29 @@ class User(db.Model, UserMixin):
     @property
     def url_avatar(self):
         """ Статические файлы на хостинге хероку постоянно удаляются, поэтому
-            картинка будет заменяться на стандартную, если оригинальная не нашлась.
+            картинка будет воспроизводиться из бд, если статическая такая не нашлась.
          """
         if not os.path.isfile(os.path.join(current_app.root_path,
                                            url_for('static', filename=f'profile_pics/{self.info.picture_name}')[1:])):
-            self.info.picture_name = ('М' == self.info.gender) * 'defaults/default_male.png' + \
-                                     ('М' != self.info.gender) * 'defaults/default_female.png'
+            """ Нет статического файла картинки
+            """
+            if self.info.picture_file is not None:
+                """ Есть какое-то бинарное значение в бд => воспроизводим его в статический файл
+                """
+                self.update_avatar(FileStorage(io.BytesIO(self.info.picture_file), self.info.picture_name, name='file', content_type='image/png'))
+            else:
+                """ Нет ничего в бд => используем стандартные статические файлы
+                """
+                self.info.picture_name = ('М' == self.info.gender) * 'defaults/default_male.png' + \
+                                         ('М' != self.info.gender) * 'defaults/default_female.png'
         return url_for('static', filename=f'profile_pics/{self.info.picture_name}')
 
     def update_avatar(self, picture_file):
-        return save_image(self.id, picture_file, self.info.picture_name)
+        picture_name, picture_file = save_image(self.id, picture_file, self.info.picture_name)
+        picture_file.stream.seek(0) # Так как уже вызывался .read() в image.py , то нужно отмотать в начало бинарник
+        self.info.picture_file = picture_file.read()
+        self.info.picture_name = picture_name
+        db.session.commit()
 
     @staticmethod
     def get_authors():
@@ -182,6 +195,7 @@ class UserInfo(db.Model):
     about = db.Column(db.String(), nullable=True)
     gender = db.Column(db.String(1))
     picture_name = db.Column(db.String(200), nullable=False, default='defaults/default_male.png')
+    picture_file = db.Column(db.LargeBinary, nullable=True, default=None)
     date = db.Column(db.DateTime, default=func.now())
     last_seen = db.Column(db.DateTime, default=func.now())
     user = db.relationship('User', backref=db.backref('info', uselist=False, cascade="all,delete,delete-orphan"))

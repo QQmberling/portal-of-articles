@@ -55,4 +55,4 @@ def save_image(id, picture_file, old_picture_name):
         old_picture_path = os.path.join(current_app.root_path, 'static/profile_pics', old_picture_name)
         delete_image(old_picture_path)
     delete_image(temp_path)
-    return picture_name
+    return picture_name, picture_file
