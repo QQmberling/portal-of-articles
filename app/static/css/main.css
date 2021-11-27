@@ -42,6 +42,15 @@ p.text {
     inline-size: auto;
 }
 
+.articles {
+    background-color: #7ee8fa;
+    background-image: linear-gradient(315deg, #7ee8fa 0%, #80ff72 74%);
+}
+.article {
+    background-color: #4dccc6;
+    background-image: linear-gradient(315deg, #4dccc6 0%, #96e4df 74%);
+}
+
 body {
     /*background-color: #d2f4d2;*/
     font-family: Roboto;
@@ -110,15 +119,14 @@ a:hover {
 
 .new {
     border: 1px solid blue;
-    background-color: greenyellow;
+    background-color: #f9ea8f;
+    background-image: linear-gradient(315deg, #f9ea8f 0%, #aff1da 74%);
+
 }
 
 .news {
-    border: 4px solid transparent;
-    -moz-border-image: -moz-linear-gradient(top left, #DC2903 , #F4F955, #0625F9);
-    -webkit-border-image: -webkit-linear-gradient(top left, #DC2903 , #F4F955, #0625F9);
-    border-image: linear-gradient(to bottom right, #d65bca , #F4F955, #3bb78f);
-    border-image-slice: 1;
+    background-color: #7ee8fa;
+    background-image: linear-gradient(315deg, #7ee8fa 0%, #80ff72 74%);
 }
 
 .bubble {

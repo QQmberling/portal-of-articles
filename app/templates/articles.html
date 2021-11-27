@@ -4,7 +4,7 @@
 <div class="container" style="width: 45%">
     {% if context.articles|length != 0 %}
     {% for article in context.articles %}
-    <div class="alert alert-info">
+    <div class="alert articles">
         <a href="/articles/{{ article.id }}">
             <span class="text-center"><h2>{{ article.title }}</h2></span>
         </a>
