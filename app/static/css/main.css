@@ -91,7 +91,6 @@ body {
     color: black;
 }
 
-/*a { text-decoration: none; }*/
 a {
     text-decoration: none;
     color: navy;
@@ -109,18 +108,17 @@ a:hover {
     border: 2px solid red;
 }
 
-.test2 {
+.new {
     border: 1px solid blue;
+    background-color: greenyellow;
 }
 
-.newsborder {
-    /*border: 10px solid pink;*/
+.news {
     border: 4px solid transparent;
     -moz-border-image: -moz-linear-gradient(top left, #DC2903 , #F4F955, #0625F9);
     -webkit-border-image: -webkit-linear-gradient(top left, #DC2903 , #F4F955, #0625F9);
-    border-image: linear-gradient(to bottom right, #DC2903 , #F4F955, #0625F9);
+    border-image: linear-gradient(to bottom right, #d65bca , #F4F955, #3bb78f);
     border-image-slice: 1;
-    background-color: lightgoldenrodyellow;
 }
 
 .bubble {
