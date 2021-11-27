@@ -2,7 +2,12 @@
 
 {% block content %}
 <div class="container">
-    <h1>Здесь будет новостная лента! =)</h1>
+    <div class="container newsborder p-4 mx-1">
+        <h1 class="px-5 py-2 text-center">Новости</h1>
+        {% for item in lst %}
+            <p class="alert news fs-4 p-4">{{ item.get_news() | safe }}</p>
+        {% endfor %}
+    </div>
 </div>
 {{super()}}
 {% endblock %}

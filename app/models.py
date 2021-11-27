@@ -67,6 +67,14 @@ class Article(db.Model):
     def update_url(self):
         return url_for('main.article_update', id=self.id)
 
+    @property
+    def main_url(self):
+        return url_for('main.article_detail', id=self.id, _external=True)
+
+    def get_news(self):
+        return f'<b>{self.date.strftime("%d-%m-%Y %H:%M")}</b> - <a href="{self.author.url_profile}">{self.author.username}</a>' \
+               f' публикует статью под названием <a href="{self.main_url}">{self.title}</a>.'
+
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -76,6 +84,10 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return '<User %r - %r>' % (self.id, self.username)
+
+    @property
+    def date(self):
+        return self.info.date
 
     @staticmethod
     def create(json):
@@ -187,6 +199,10 @@ class User(db.Model, UserMixin):
         self.info.last_seen = func.now()
         db.session.commit()
 
+    def get_news(self):
+        return f'<b>{self.date.strftime("%d-%m-%Y %H:%M")}</b> - Пользователь <a href="{self.url_profile}">{self.username}</a>' \
+               f' присоединился к нам!!!'
+
 
 class UserInfo(db.Model):
     id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"), primary_key=True, autoincrement=True)
@@ -252,3 +268,8 @@ class Comment(db.Model):
     @property
     def update_url(self):
         return url_for('main.prank', id=self.id)
+
+    def get_news(self):
+        return f'<b>{self.date.strftime("%d-%m-%Y %H:%M")}</b> - <a href="{self.author.url_profile}">' \
+               f'{self.author.username}</a> комментирует статью <a href="{self.article.main_url}">{self.article.title}</a>: ' \
+               f'<a href="{self.article.main_url}">{self.text[:30]}...</a>'

@@ -10,7 +10,7 @@ class Config:
     SECRET_KEY = environ.get('SECRET_KEY') or 'YOU SHALL NOT GUESS'
     ADMIN_PSW = environ.get('ADMIN_PSW') or 'admin'
     MAX_CONTENT_LENGTH = 16 * 1000 * 1000
-    UPLOAD_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif']
+    UPLOAD_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif']
     MIN_PICTURE_SIZE = (200, 200)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     BUNDLE_ERRORS = True

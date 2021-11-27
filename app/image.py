@@ -1,4 +1,5 @@
 import os
+import pathlib
 import uuid
 
 from PIL import Image
@@ -28,11 +29,11 @@ def convert_to_rgb(path):
             image.save(path)
     except:
         delete_image(path)
-        raise ValidationError(f'Failed to convert to RGB')
+        raise ValidationError(f'Image can\'t be load properly, please try another one')
 
 
 def validate_image(picture_file):
-    ext = picture_file.filename.split('.')[-1]
+    ext = pathlib.Path(picture_file.filename).suffix
     if ext not in current_app.config['UPLOAD_EXTENSIONS']:
         raise ValidationError(f'Extension "{ext}" is not allowed')
 

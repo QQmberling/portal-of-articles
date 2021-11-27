@@ -100,7 +100,8 @@ def register():
 @main.route('/home')
 def index():
     context = {'legend': 'Главная'}
-    return render_template('index.html', context=context)
+    all_instances = sorted(User.query.all() + Article.query.all() + Comment.query.all(), key=lambda x: x.date, reverse=True)
+    return render_template('index.html', context=context, lst=all_instances)
 
 
 @main.route('/articles')
