@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, BooleanField, PasswordField, TextAreaField, FileField, SelectField
+from wtforms import StringField, SubmitField, BooleanField, PasswordField, TextAreaField, FileField, SelectField, DateField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError, Regexp
 
 from app.models import User
@@ -72,6 +72,12 @@ class ArticleEditForm(FlaskForm):
     submit = SubmitField("Подтвердить")
 
 
-class CreateCommentForm(FlaskForm):
+class CommentCreateForm(FlaskForm):
     text = TextAreaField('', validators=[DataRequired()])
     submit = SubmitField("Отправить")
+
+
+class DateFilterForm(FlaskForm):
+    date1 = DateField(validators=[DataRequired()])
+    date2 = DateField(validators=[DataRequired()])
+    submit = SubmitField("Применить")

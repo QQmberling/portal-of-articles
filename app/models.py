@@ -216,6 +216,9 @@ class UserInfo(db.Model):
     last_seen = db.Column(db.DateTime, default=func.now())
     user = db.relationship('User', backref=db.backref('info', uselist=False, cascade="all,delete,delete-orphan"))
 
+    def get_news(self):
+        return self.user.get_news()
+
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -273,3 +276,6 @@ class Comment(db.Model):
         return f'<b>{self.date.strftime("%d-%m-%Y %H:%M")}</b> - <a href="{self.author.url_profile}">' \
                f'{self.author.username}</a> комментирует статью <a href="{self.article.main_url}">{self.article.title}</a>: ' \
                f'<a href="{self.article.main_url}">{self.text[:30]}...</a>'
+
+
+models = [UserInfo, Article, Comment]

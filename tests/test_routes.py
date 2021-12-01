@@ -195,8 +195,6 @@ def test_profile_with_login(logged_john):
 def test_index_page(client):
     response = client.get('/', follow_redirects=True)
     assert response.status_code == 200
-    response = client.get('/home', follow_redirects=True)
-    assert response.status_code == 200
 
 
 def test_create_article_without_login(client):
@@ -216,5 +214,5 @@ def test_ping_user(logged_john):
     user = db.session.query(User).filter_by(username='john').first()
     last_seen_previos = user.info.last_seen
     assert last_seen_previos > user.info.date
-    response = logged_john.get('/home', follow_redirects=True)
+    response = logged_john.get('/', follow_redirects=True)
     assert user.info.last_seen > last_seen_previos

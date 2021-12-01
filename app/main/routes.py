@@ -2,9 +2,9 @@ from flask import render_template, request, redirect, flash, url_for, session, a
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.datastructures import MultiDict
 
-from app.models import User, Article, Comment
+from app.models import User, Article, Comment, UserInfo, models
 from . import main
-from .forms import LoginForm, RegistrationForm, ArticleCreateForm, ArticleEditForm, UserEditForm, CreateCommentForm
+from .forms import LoginForm, RegistrationForm, ArticleCreateForm, ArticleEditForm, UserEditForm, CommentCreateForm, DateFilterForm
 from .. import db, login_manager
 from ..exceptions import ValidationError
 
@@ -96,12 +96,19 @@ def register():
     return render_template('register.html', context=context, form=form)
 
 
-@main.route('/')
-@main.route('/home')
+@main.route('/', methods=['POST', 'GET'])
 def index():
+    form = DateFilterForm()
     context = {'legend': 'Главная'}
-    all_instances = sorted(User.query.all() + Article.query.all() + Comment.query.all(), key=lambda x: x.date, reverse=True)
-    return render_template('index.html', context=context, lst=all_instances)
+    all_instances = []
+    if request.method == 'GET':
+        all_instances = UserInfo.query.all() + Article.query.all() + Comment.query.all()
+    elif form.validate_on_submit():
+        for model in models:
+            all_instances.extend(model.query.filter(model.date.between(form.date1.data, form.date2.data)).all())
+            # all_instances = [el for el in map(lambda x: x if form.date1.data < x.date.date() < form.date2.data else None, all_instances) if el is not None]
+    all_instances.sort(key=lambda x: x.date, reverse=True)
+    return render_template('index.html', context=context, lst=all_instances, form=form)
 
 
 @main.route('/articles')
@@ -117,7 +124,7 @@ def article_detail(id):
     article = db.session.query(Article).filter(Article.id == id).first_or_404()
     if request.method == 'POST':
         if current_user.is_authenticated:
-            form = CreateCommentForm()
+            form = CommentCreateForm()
             if form.validate_on_submit():
                 payload = {'text': form.text.data, 'author_id': current_user.id, 'article_id': id}
                 Comment.create(payload)

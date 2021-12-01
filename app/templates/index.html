@@ -4,8 +4,17 @@
 <div class="container">
     <div class="alert news p-4 mx-1">
         <h1 class="px-5 py-2 text-center">Новости</h1>
+        <form action="" method="POST">
+            {{form.hidden_tag()}}
+            <p class="fs-4 p-2 test2">Период: {{form.date1}} по {{form.date2}} {{form.submit(class='mx-4')}}</p>
+        </form>
         {% for item in lst %}
-            <p class="alert new fs-4 p-4 test2">{{ item.get_news() | safe }}</p>
+            {% if item %}<p class="alert new fs-4 p-4 test2">{{ item.get_news() | safe }}</p>{% endif %}
+        {% else %}
+                <div class='alert alert-danger px-5 m-2'>
+                Ничего не нашлось =(
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">×</span>
+                </div>
         {% endfor %}
     </div>
 </div>
