@@ -98,15 +98,14 @@ def register():
 
 @main.route('/', methods=['POST', 'GET'])
 def index():
-    form = DateFilterForm()
     context = {'legend': 'Главная'}
     all_instances = []
-    if request.method == 'GET':
-        all_instances = UserInfo.query.all() + Article.query.all() + Comment.query.all()
-    elif form.validate_on_submit():
-        for model in models:
-            all_instances.extend(model.query.filter(model.date.between(form.date1.data, form.date2.data)).all())
-            # all_instances = [el for el in map(lambda x: x if form.date1.data < x.date.date() < form.date2.data else None, all_instances) if el is not None]
+    form = DateFilterForm()
+    date1 = form.date1.data
+    date2 = form.date2.data
+    # all_instances = [el for el in map(lambda x: x if form.date1.data < x.date.date() < form.date2.data else None, all_instances) if el is not None]
+    for model in models:
+        all_instances.extend(model.query.filter(model.date.between(date1, date2)).all())
     all_instances.sort(key=lambda x: x.date, reverse=True)
     return render_template('index.html', context=context, lst=all_instances, form=form)
 

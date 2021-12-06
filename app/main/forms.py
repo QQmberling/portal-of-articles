@@ -1,3 +1,5 @@
+import datetime
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, BooleanField, PasswordField, TextAreaField, FileField, SelectField, DateField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError, Regexp
@@ -81,3 +83,10 @@ class DateFilterForm(FlaskForm):
     date1 = DateField(validators=[DataRequired()])
     date2 = DateField(validators=[DataRequired()])
     submit = SubmitField("Применить")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.date2.data:
+            self.date2.data = datetime.date.today()
+        if not self.date1.data:
+            self.date1.data = self.date2.data - datetime.timedelta(days=60)
