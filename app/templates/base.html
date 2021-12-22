@@ -6,44 +6,40 @@
 <link href="{{ url_for('static', filename='img/favicon.ico') }}" rel="shortcut icon">
 {% endblock %}
 
-{% block title %}Shrekoblog{% endblock %}
+{% block title %}{% endblock %}
 
 {% block navbar %}
-<nav class="navbar navbar-expand-lg" style="background-color: #77dd77;">
-    <div class="container-fluid">
+<header class="p-3 text-white" style="background-color: #77dd77;">
+    <div class="container">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
         <a href="{{url_for('main.index')}}"><img class="navbar-brand-logo px-4"
                                                  src="{{url_for('static', filename='img/logo2.jpg')}}"></a>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <div class="d-flex px-2">
-                <a class="btn btn-dark" href="/articles">Статьи</a>
-            </div>
-            <div class="d-flex px-2">
-                <a class="btn btn-dark" href="/authors">Авторы</a>
-            </div>
-            <div class="d-flex px-2">
-                <a class="btn btn-danger" href="/api/v1/docs">API</a>
-            </div>
-        </div>
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+              <li><form><button type="submit" formaction="/articles" class="btn btn-outline-light btn-dark me-2">Статьи</button></form></li>
+              <li><form><button type="submit" formaction="/authors" class="btn btn-outline-light btn-dark me-2">Авторы</button></form></li>
+              <li><form><button type="submit" formaction="/api/v1/docs" class="btn btn-outline-light btn-danger me-2">API</button></form></li>
+        </ul>
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
+          <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search">
+        </form>
+        <div class="text-end">
         {% if current_user.is_authenticated %}
-        <div class="d-flex px-2">
-            <a class="btn btn-success" href="/create-article">Написать статью</a>
-        </div>
-        <div class="d-flex px-2">
-            <a class="btn btn-danger" href="/logout">Выйти</a>
-        </div>
-        <div class="d-flex px-2">
-            <a class="btn btn-dark" href="/profile">Профиль</a>
-        </div>
+            <form>
+            <button type="submit" formaction="/create-article" class="btn btn-outline-light btn-success me-2">Написать статью</button>
+            <button type="submit" formaction="/logout" class="btn btn-outline-light btn-danger me-2">Выйти</button>
+            <button type="submit" formaction="/profile" class="btn btn-outline-light btn-dark me-2">Профиль</button>
+            </form>
         {% else %}
-        <div class="d-flex px-2">
-            <a class="btn btn-success" href="/register" type="href">Регистрация</a>
-        </div>
-        <div class="d-flex px-2">
-            <a class="btn btn-dark" href="/login" type="href">Войти</a>
-        </div>
+            <form>
+                <button type="submit" formaction="/register" class="btn btn-outline-light btn-success me-2">Регистрация</button>
+                <button type="submit" formaction="/login" class="btn btn-outline-light btn-dark me-2">Войти</button>
+            </form>
         {% endif %}
+        </div>
+      </div>
     </div>
-</nav>
+</header>
+
 <div class="container w-50 mt-3">
     <fieldset class="form-group">
         <legend class='border-bottom mb-4 display-6 text-center'>{{context.legend}}</legend>
